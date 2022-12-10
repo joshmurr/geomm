@@ -15,8 +15,8 @@
   "author": "Josh Murr",
   "license": "ISC",
   "workspaces": [
-    "packages/core",
-    "packages/webgl"
+    "packages/*",
+    "examples/*"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.46.0",

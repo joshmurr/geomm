@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
-    "incremental": true,
+    "module": "es2020",
     "target": "es2020",
-    "module": "commonjs",
     "declaration": true,
-    "sourceMap": true,
-    "strict": true,
-    "moduleResolution": "node",
+    "declarationMap": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-
-    "composite": true
-  }
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "importsNotUsedAsValues": "error",
+    "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "strictNullChecks": true
+  },
+  "exclude": ["./**/node_modules"]
 }
