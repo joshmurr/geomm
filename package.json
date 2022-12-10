@@ -1,0 +1,27 @@
+{
+  "name": "geomm",
+  "version": "1.0.0",
+  "description": "A collection of tools for creative computing.",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "keywords": [
+    "3d",
+    "graphics",
+    "webgl",
+    "webgl2",
+    "canvas"
+  ],
+  "author": "Josh Murr",
+  "license": "ISC",
+  "workspaces": [
+    "packages/core",
+    "packages/webgl"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "@typescript-eslint/parser": "^5.46.0",
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4"
+  }
+}
