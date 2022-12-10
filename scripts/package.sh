@@ -14,34 +14,43 @@ install_package() {
 
 	echo "Installing package $PACKAGE_NAME in $PACKAGE_DIR..."
 
-	npm init -y --scope @geomm -w "$PACKAGE_DIR"
-	npm install -D typescript -w "$PACKAGE_DIR"
-
 	mkdir -p "$PACKAGE_DIR/src"
 
-	echo "{
-  \"extends\": \"../../tsconfig.base.json\",
-  \"compilerOptions\": {
-    \"rootDir\": \"src\",
-    \"outDir\": \"lib\"
-  },
-  \"include\": [\"src/**/*\"]
-}" >"./$PACKAGE_DIR/tsconfig.json"
+	cat <<EOF >"./$PACKAGE_DIR"/tsconfig.json
+  {
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "rootDir": "src",
+      "outDir": "lib"
+    },
+    "include": [
+      "./src/**/*.ts"
+    ]
+  }
+EOF
 
-	echo "{
-  \"name\": \"@geomm/$PACKAGE_NAME\",
-  \"version\": \"1.0.0\",
-  \"description\": \"\",
-  \"main\": \"lib/index.js\",
-  \"types\": \"lib/index.d.ts\",
-  \"keywords\": [],
-  \"author\": \"Josh Murr\",
-  \"license\": \"ISC\",
-}" >"./$PACKAGE_DIR/package.json"
+	cat <<EOF >"./$PACKAGE_DIR"/package.json
+{
+  "name": "@geomm/$PACKAGE_NAME",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "keywords": [],
+  "author": "Josh Murr",
+  "license": "ISC",
+  "dependencies": {
+    "@geomm/api": "^1.0.0"
+  }
+}
+EOF
 
 	# Add reference in root tsconfig.json so that it builds
 	TSCONFIG_REF="{ \"path\": \"$PACKAGE_DIR\" },"
 	printf '$-2i\n    %s\n.\nw\n' "$TSCONFIG_REF" | ed -s "./tsconfig.json"
+
+	# Refresh monorepo
+	npm i &>/dev/null
 
 	echo "Done installing $PACKAGE_NAME."
 }
