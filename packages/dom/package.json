@@ -1,0 +1,17 @@
+{
+  "name": "@geomm/dom",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "module": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "keywords": [],
+  "author": "Josh Murr",
+  "license": "ISC",
+  "scripts": {
+    "build": "tsc --declaration"
+  },
+  "dependencies": {
+    "@geomm/api": "^1.0.0"
+  }
+}
