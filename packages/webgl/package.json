@@ -2,15 +2,19 @@
   "name": "@geomm/webgl",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "module": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --declaration"
   },
   "keywords": [],
-  "author": "",
+  "author": "Josh Murr",
   "license": "ISC",
   "dependencies": {
-    "@geomm/core": "^1.0.0"
+    "@geomm/api": "^1.0.0",
+    "@geomm/core": "^1.0.0",
+    "@geomm/geometry": "^1.0.0",
+    "@geomm/dom": "^1.0.0"
   }
 }
