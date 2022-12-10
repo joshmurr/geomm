@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	echo "Usage: $0 [ -i INSTALL ] [ -u UNINSTALL ]" 1>&2
+	echo "Usage: $0 [ -n NEW ] [ -d DELETE ]" 1>&2
 }
 exit_abnormal() {
 	usage
@@ -23,9 +23,7 @@ install_package() {
       "rootDir": "src",
       "outDir": "lib"
     },
-    "include": [
-      "./src/**/*.ts"
-    ]
+    "include": ["./src/**/*"]
   }
 EOF
 
@@ -34,11 +32,15 @@ EOF
   "name": "@geomm/$PACKAGE_NAME",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "module": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
   "keywords": [],
   "author": "Josh Murr",
   "license": "ISC",
+  "scripts": {
+    "build": "tsc --declaration"
+  },
   "dependencies": {
     "@geomm/api": "^1.0.0"
   }
@@ -71,12 +73,12 @@ uninstall_package() {
 	echo "Done uninstalling $PACKAGE_NAME."
 }
 
-while getopts ":i:u:" OPTION; do
+while getopts ":n:d:" OPTION; do
 	case "$OPTION" in
-	i)
+	n)
 		install_package ${OPTARG}
 		;;
-	u)
+	d)
 		uninstall_package ${OPTARG}
 		;;
 	:) # If expected argument omitted:
