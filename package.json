@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A collection of tools for creative computing.",
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "watch": "tsc -b --watch"
   },
   "keywords": [
     "3d",

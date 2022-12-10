@@ -1,8 +1,10 @@
-
 {
   "files": [],
   "references": [
     { "path": "packages/core" },
+    { "path": "packages/api" },
+    { "path": "packages/dom" },
+    { "path": "packages/geometry" },
     { "path": "packages/webgl" }
   ]
 }
