@@ -2,12 +2,13 @@
   "name": "@geomm/core",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "type": "module",
+  "module": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
   "keywords": [],
   "author": "",
+  "scripts": {
+    "build": "tsc --declaration"
+  },
   "license": "ISC"
 }

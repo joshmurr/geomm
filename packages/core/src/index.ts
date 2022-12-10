@@ -1,3 +1,1 @@
-const hello = (name: string) => `Hello, ${name}.`
-
-export { hello }
+export * from './dispatch'
