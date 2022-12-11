@@ -5,6 +5,7 @@
     { "path": "packages/api" },
     { "path": "packages/dom" },
     { "path": "packages/geometry" },
+    { "path": "packages/maths" },
     { "path": "packages/webgl" }
   ]
 }
