@@ -49,9 +49,9 @@ export const setUniforms = (
   setters: StringMap<(val: unknown) => void>,
   uniforms: StringMap<unknown>,
 ) => {
-  for (const [name, values] of Object.entries(uniforms)) {
+  for (const [name, value] of Object.entries(uniforms)) {
     if (!setters[name]) continue // Uniform was not found in shader
-    setters[name](values)
+    setters[name](value)
   }
 }
 

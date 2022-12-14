@@ -15,7 +15,7 @@ export const setters = (
   const _setters: { [key: number]: Setter } = {
     0x1406: {
       constant: 'FLOAT',
-      fn: (val: number[]) => gl.uniform1f(loc, val[0]),
+      fn: (val: number) => gl.uniform1f(loc, val),
     },
     0x8b50: {
       constant: 'FLOAT_VEC2',
