@@ -12,9 +12,9 @@ import {
   identityMat,
   matFromTransformations,
   projectionMat,
-  rotateAngleAxis3D,
-  translate3D,
   viewMat,
+  sin,
+  floor,
 } from '@geomm/maths'
 
 const vert = `#version 300 es
@@ -51,36 +51,18 @@ add(c)
 
 const program = shaderProgram(gl, vert, frag)
 
-/* const quadBuf = createBufferInfoForProgram(gl, quad, program) */
 const quadBuf = quadBuffer(gl, program)
 const quadVAO = createVAO(gl, quadBuf)
 
-const textureFactory = textureLoader(gl)
 gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
+const textureFactory = textureLoader(gl)
 const smallTex = textureFactory(2, 2, 'R8', 'RED')
-const data = new Uint8Array([255, 128, 192, 0])
-const tex = smallTex(data)
-
-/* const modelM = identityMat() */
-const modelM = matFromTransformations({
-  translation: [0.2, 0.2, -3],
-  rotation: {
-    axis: [0, 0.2, 1],
-    angle: 45,
-  },
-  scale: [1, 1, 1],
-})
-const viewM = viewMat()
-const projM = projectionMat()
-
-/* const transModelM = translate3D(modelM, [0, 0, -5]) */
-/* const rotModelM = rotateAngleAxis3D(transModelM, 45, [0, 1, 0]) */
 
 const uniforms = {
-  u_ModelMatrix: modelM,
-  u_ViewMatrix: viewM,
-  u_ProjectionMatrix: projM,
-  u_Texture: tex,
+  u_ModelMatrix: identityMat(),
+  u_ViewMatrix: viewMat(),
+  u_ProjectionMatrix: projectionMat(),
+  u_Texture: smallTex(new Uint8Array([255, 128, 192, 0])),
 }
 
 const uniformSetters = getUniformSetters(gl, program)
@@ -94,7 +76,7 @@ const draw = (time: number) => {
   gl.clearColor(0.9, 0.9, 0.9, 1)
 
   const smallTime = time * 0.001
-  const r = Math.round((Math.sin(smallTime * 2) + 1) * 127) % 255
+  const r = floor((sin(smallTime * 2) + 1) * 127) % 255
 
   const data = new Uint8Array([r, 128, 192, 0])
   setUniforms(uniformSetters, {
@@ -105,7 +87,7 @@ const draw = (time: number) => {
         axis: [0, 0.2, 1],
         angle: smallTime,
       },
-      scale: [1, Math.sin(smallTime) * 0.5 + 1, 1],
+      scale: [1, sin(smallTime) * 0.5 + 1, 1],
     }),
 
     u_Texture: smallTex(data),
