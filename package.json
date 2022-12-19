@@ -4,7 +4,8 @@
   "description": "A collection of tools for creative computing.",
   "scripts": {
     "build": "tsc --build",
-    "watch": "tsc -b --watch"
+    "watch": "tsc -b --watch",
+    "clean:tsbuild": "find . -name \"*.tsbuildinfo\" -type f -delete"
   },
   "keywords": [
     "3d",
