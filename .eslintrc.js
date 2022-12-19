@@ -6,21 +6,26 @@ module.exports = {
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
+      extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'prettier',
+      ],
+      parserOptions: {
+        project: [
+          './tsconfig.json',
+          './packages/*/tsconfig.json',
+          './examples/*/tsconfig.json',
+        ] /* NOTE: Important !! */,
+        tsconfigRootDir: __dirname /* NOTE: Not important but probably good */,
+        ecmaVersion: 2020,
+        ecmaFeatures: {
+          jsx: false,
+        },
+      },
     },
-  ],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
   ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json',
-    ecmaVersion: 2020,
-    ecmaFeatures: {
-      jsx: false,
-    },
-  },
   plugins: ['@typescript-eslint'],
   root: true,
   rules: {
