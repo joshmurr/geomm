@@ -8,10 +8,12 @@ import {
 } from '@geomm/webgl'
 import { add } from '@geomm/dom'
 import {
+  cos,
   identityMat,
   matFromTransformations,
   normalMatFromModel,
   projectionMat,
+  sin,
   viewMat,
 } from '@geomm/maths'
 import { nIndices } from '@geomm/geometry'
@@ -93,7 +95,7 @@ const draw = (time: number) => {
   const modelViewMat = matFromTransformations({
     translation: [0, 0, -6],
     rotation: {
-      axis: [1, 1, 1],
+      axis: [cos(sin(smallTime)), cos(sin(smallTime)), sin(cos(smallTime))],
       angle: smallTime,
     },
     scale: [1, 1, 1],
