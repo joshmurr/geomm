@@ -22,7 +22,6 @@ precision mediump float;
 in vec3 i_Position;
 in vec3 i_Normal;
 in vec2 i_TexCoord;
-in vec4 i_Color;
 
 uniform mat4 u_ProjectionMatrix;
 uniform mat4 u_ViewMatrix;
@@ -30,13 +29,12 @@ uniform mat4 u_ModelMatrix;
 uniform mat4 u_NormalMatrix;
 
 out vec2 v_TexCoord;
-out vec4 v_Color;
 out vec3 v_Lighting;
+out vec4 v_Normal;
 
 void main(){
   gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * vec4(i_Position, 1.0);
   v_TexCoord = i_TexCoord;
-  v_Color = i_Color;
 
   vec3 ambientLight = vec3(0.3, 0.3, 0.3);
   vec3 directionalLightColor = vec3(1, 1, 1);
@@ -46,6 +44,7 @@ void main(){
 
   float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
   v_Lighting = ambientLight + (directionalLightColor * directional);
+  v_Normal = transformedNormal;
 }`
 
 const frag = `#version 300 es
@@ -53,12 +52,12 @@ precision mediump float;
 
 in vec2 v_TexCoord;
 in vec3 v_Lighting;
-in vec4 v_Color;
+in vec4 v_Normal;
 
 out vec4 OUTCOLOUR;
 
 void main(){
-  OUTCOLOUR = vec4(v_Color.rgb * v_Lighting, 1.0);
+  OUTCOLOUR = vec4(vec3(0.6, 0.1, 0.8) * v_Lighting, 1.0);
 }`
 
 const [c, gl] = webgl2Canvas(512, 512)
@@ -82,8 +81,12 @@ gl.useProgram(program)
 setUniforms(uniformSetters, uniforms)
 
 const draw = (time: number) => {
+  gl.clearColor(0.2, 0.2, 0.4, 1)
+  gl.clearDepth(1.0) // Clear everything
+  gl.enable(gl.DEPTH_TEST) // Enable depth testing
+  gl.depthFunc(gl.LEQUAL) // Near things obscure far things
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  gl.clearColor(0.9, 0.9, 0.9, 1)
 
   const smallTime = time * 0.001
 
