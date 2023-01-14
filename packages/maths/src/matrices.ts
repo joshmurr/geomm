@@ -62,3 +62,11 @@ export const applyTransformations = (
 
   return m
 }
+
+export const normalMatFromModel = (modelViewMat: mat4) => {
+  const normalMatrix = mat4.create()
+  mat4.invert(normalMatrix, modelViewMat)
+  mat4.transpose(normalMatrix, normalMatrix)
+
+  return normalMatrix
+}
