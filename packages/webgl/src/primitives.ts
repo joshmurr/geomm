@@ -1,4 +1,4 @@
-import { cube, quad } from '@geomm/geometry'
+import { cube, quad, icosahedron } from '@geomm/geometry'
 import type { PrimitiveBuffer } from './api'
 import { createBufferInfoForProgram } from './buffers'
 
@@ -14,4 +14,11 @@ export const cubeBuffer = (
   program: WebGLProgram,
 ): PrimitiveBuffer => {
   return createBufferInfoForProgram(gl, cube, program)
+}
+
+export const icosahedronBuffer = (
+  gl: WebGL2RenderingContext,
+  program: WebGLProgram,
+): PrimitiveBuffer => {
+  return createBufferInfoForProgram(gl, icosahedron, program)
 }
