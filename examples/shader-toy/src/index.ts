@@ -2,6 +2,7 @@ import {
   createVAO,
   getUniformSetters,
   quadBuffer,
+  simpleRender,
   setUniforms,
   shaderProgram,
   webgl2Canvas,
@@ -49,18 +50,11 @@ gl.bindVertexArray(quadVAO)
 gl.useProgram(program)
 setUniforms(uniformSetters, uniforms)
 
-const draw = (time: number) => {
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  gl.clearColor(0.9, 0.9, 0.9, 1)
-
-  setUniforms(uniformSetters, {
-    ...uniforms,
-    u_Time: time * 0.001,
-  })
-
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0)
-  requestAnimationFrame(draw)
-}
-
-requestAnimationFrame(draw)
+simpleRender(gl, false, [
+  {
+    vao: quadVAO,
+    program: program,
+    uniforms: uniforms,
+    setters: uniformSetters,
+  },
+])
