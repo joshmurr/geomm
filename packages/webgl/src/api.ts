@@ -1,4 +1,4 @@
-import type { TypedArray } from '@geomm/api'
+import type { StringMap, TypedArray } from '@geomm/api'
 
 export type WGL2RC = WebGL2RenderingContext
 
@@ -25,9 +25,7 @@ export interface Setter {
   fn: SetterFn<any>
 }
 
-export type Setters = {
-  [key: string]: Setter
-}
+export type Setters = StringMap<(val: unknown) => void>
 
 export interface IndicesBuffer {
   data: TypedArray
@@ -66,4 +64,22 @@ export interface PrimitiveData {
 export interface PrimitiveBuffer {
   attributes: BufferInfo[]
   indices: IndicesBuffer
+}
+
+export interface Program {
+  vao: WebGLVertexArrayObject
+  program: WebGLProgram
+  uniforms: StringMap<unknown>
+  setters: Setters
+  fbo?: WebGLFramebuffer | null
+  resolution?: { x: number; y: number } | null
+}
+
+export interface ProgramInfo {
+  vertShader: string
+  fragShader: string
+  bufferFn: (
+    gl: WebGL2RenderingContext,
+    program: WebGLProgram,
+  ) => PrimitiveBuffer
 }
