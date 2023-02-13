@@ -1,12 +1,45 @@
 {
   "name": "@geomm/webgl",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
   "typings": "./lib/index.d.ts",
   "scripts": {
     "build": "tsc --declaration"
+  },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./buffers": {
+      "default": "./lib/bufffers.js"
+    },
+    "./dom": {
+      "default": "./lib/dom.js"
+    },
+    "./framebuffers": {
+      "default": "./lib/framebuffers.js"
+    },
+    "./primitives": {
+      "default": "./lib/primitives.js"
+    },
+    "./render": {
+      "default": "./lib/render.js"
+    },
+    "./setters": {
+      "default": "./lib/setters.js"
+    },
+    "./textures": {
+      "default": "./lib/textures.js"
+    },
+    "./uniforms": {
+      "default": "./lib/uniforms.js"
+    }
   },
   "keywords": [],
   "author": "Josh Murr",
