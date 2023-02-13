@@ -11,6 +11,21 @@
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./buffers": {
+      "default": "./lib/rawBufffers.js"
+    },
+    "./dom": {
+      "default": "./lib/utils.js"
+    }
+  },
   "dependencies": {
     "@geomm/api": "^1.0.0"
   }

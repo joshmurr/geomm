@@ -11,6 +11,27 @@
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./core": {
+      "default": "./lib/core.js"
+    },
+    "./matrices": {
+      "default": "./lib/matrices.js"
+    },
+    "./utils": {
+      "default": "./lib/utils.js"
+    },
+    "./vectors": {
+      "default": "./lib/vectors.js"
+    }
+  },
   "dependencies": {
     "@geomm/api": "^1.0.0",
     "gl-matrix": "^3.4.3"

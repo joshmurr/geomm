@@ -10,5 +10,17 @@
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./dispatch": {
+      "default": "./lib/dispatch.js"
+    }
+  },
   "license": "ISC"
 }

@@ -11,6 +11,21 @@
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./canvas": {
+      "default": "./lib/canvas.js"
+    },
+    "./core": {
+      "default": "./lib/core.js"
+    }
+  },
   "dependencies": {
     "@geomm/api": "^1.0.0",
     "@geomm/maths": "^1.0.0"
