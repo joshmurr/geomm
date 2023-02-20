@@ -46,7 +46,7 @@ export const getUniformSetters = (gl: WGL2RC, program: WebGLProgram) => {
 }
 
 export const setUniforms = (
-  setters: StringMap<(val: unknown) => void>,
+  setters: StringMap<(val: unknown, name?: string) => void>,
   uniforms: StringMap<unknown>,
 ) => {
   for (const [name, value] of Object.entries(uniforms)) {

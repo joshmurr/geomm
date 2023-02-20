@@ -24,6 +24,9 @@ export const simpleRender = (
         resolution?.x || gl.canvas.width,
         resolution?.y || gl.canvas.height,
       )
+
+      console.log(uniforms)
+
       setUniforms(setters, {
         u_Time: time,
         ...uniforms,

@@ -8,6 +8,8 @@ import {
 } from '@geomm/webgl'
 import { add } from '@geomm/dom'
 
+const MOUSE = { x: 0, y: 0 }
+
 const vert = `#version 300 es
 precision mediump float;
 
@@ -41,11 +43,12 @@ precision mediump float;
 
 uniform vec2 u_Resolution;
 uniform sampler2D u_Texture;
+uniform float scale;
 in vec2 v_TexCoord;
 out vec4 OUTCOLOUR;
 
 void main(){
-  OUTCOLOUR = texture(u_Texture, v_TexCoord);
+  OUTCOLOUR = texture(u_Texture, v_TexCoord) + vec4(scale, vec3(0.0));
 }`
 
 const programRes = { x: 16, y: 16 }
@@ -91,7 +94,7 @@ const outputUniforms = {
   u_Texture: renderTex,
 }
 
-simpleRender(gl, true, [
+simpleRender(gl, false, [
   {
     vao: programQuadVAO,
     program: program,
@@ -103,7 +106,17 @@ simpleRender(gl, true, [
   {
     vao: outputQuadVAO,
     program: outputProgram,
-    uniforms: outputUniforms,
+    uniforms: {
+      ...outputUniforms,
+    },
     setters: outputUniformSetters,
   },
 ])
+
+c.addEventListener('mousemove', function (e) {
+  const rect = this.getBoundingClientRect()
+  MOUSE.x = e.clientX - rect.left
+  MOUSE.y = rect.height - (e.clientY - rect.top) - 1
+  //MOUSE.x /= SCALE
+  //MOUSE.y /= SCALE
+})

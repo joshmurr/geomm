@@ -83,3 +83,20 @@ export interface ProgramInfo {
     program: WebGLProgram,
   ) => PrimitiveBuffer
 }
+
+export interface TextureOpts {
+  name: string
+  width?: number
+  height?: number
+  type: keyof WGL2RC
+  format: keyof WGL2RC
+  unit?: number
+  filter?: keyof WGL2RC
+  wrap?: keyof WGL2RC
+  data?: any
+}
+
+export interface TextureOptsOut extends TextureOpts {
+  texture: WebGLTexture
+  unit: number
+}

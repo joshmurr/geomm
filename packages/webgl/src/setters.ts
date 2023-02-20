@@ -1,14 +1,13 @@
-import type { Setter, WGL2RC } from './api'
+import type { Setter, TextureOptsOut, WGL2RC } from './api'
 
 export const setters = (
   gl: WGL2RC,
   type: GLenum,
   loc: WebGLUniformLocation,
 ) => {
-  const samplerSetter = (texture: WebGLTexture) => {
-    /* const unit = this._textureUnitMap.indexOf(name) */
-    gl.uniform1i(loc, 0)
-    gl.activeTexture(gl.TEXTURE0 + 0)
+  const samplerSetter = ({ texture, unit }: TextureOptsOut) => {
+    gl.uniform1i(loc, unit)
+    gl.activeTexture(gl.TEXTURE0 + unit)
     gl.bindTexture(gl.TEXTURE_2D, texture)
   }
 
@@ -43,7 +42,7 @@ export const setters = (
     },
     0x8b5e: {
       constant: 'SAMPLER_2D',
-      fn: (texture: WebGLTexture) => samplerSetter(texture),
+      fn: (textureOpts: TextureOptsOut) => samplerSetter(textureOpts),
     },
   }
   return _setters[type]

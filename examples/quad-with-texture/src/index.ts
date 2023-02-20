@@ -1,10 +1,11 @@
 import {
+  createTexture,
   createVAO,
   getUniformSetters,
   quadBuffer,
   setUniforms,
   shaderProgram,
-  textureLoader,
+  updateTexture,
   webgl2Canvas,
 } from '@geomm/webgl'
 import { add } from '@geomm/dom'
@@ -39,11 +40,13 @@ precision mediump float;
 
 in vec2 v_TexCoord;
 uniform sampler2D u_Texture;
+uniform sampler2D u_SecondTexture;
 
 out vec4 OUTCOLOUR;
 
 void main(){
   OUTCOLOUR = texture(u_Texture, v_TexCoord);
+  OUTCOLOUR = texture(u_SecondTexture, v_TexCoord);
 }`
 
 const [c, gl] = webgl2Canvas(512, 512)
@@ -55,14 +58,29 @@ const quadBuf = quadBuffer(gl, program)
 const quadVAO = createVAO(gl, quadBuf)
 
 gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
-const textureFactory = textureLoader(gl)
-const smallTex = textureFactory(2, 2, 'R8', 'RED')
+const redTex = createTexture(gl, {
+  name: 'u_Texture',
+  width: 1,
+  height: 1,
+  type: 'RGB8',
+  format: 'RGB',
+  data: new Uint8ClampedArray([0, 0, 255]),
+})
+const blueTex = createTexture(gl, {
+  name: 'u_SecondTexture',
+  width: 1,
+  height: 1,
+  type: 'RGB8',
+  format: 'RGB',
+  data: new Uint8ClampedArray([255, 0, 0]),
+})
 
 const uniforms = {
   u_ModelMatrix: identityMat(),
   u_ViewMatrix: viewMat(),
   u_ProjectionMatrix: projectionMat(),
-  u_Texture: smallTex(new Uint8Array([255, 128, 192, 0])),
+  u_Texture: blueTex,
+  u_SecondTexture: redTex,
 }
 
 const uniformSetters = getUniformSetters(gl, program)
@@ -78,7 +96,8 @@ const draw = (time: number) => {
   const smallTime = time * 0.001
   const r = floor((sin(smallTime * 2) + 1) * 127) % 255
 
-  const data = new Uint8Array([r, 128, 192, 0])
+  const redData = new Uint8Array([r, 0, 0])
+  const blueData = new Uint8Array([0, 0, r])
   setUniforms(uniformSetters, {
     ...uniforms,
     u_ModelMatrix: matFromTransformations({
@@ -89,8 +108,8 @@ const draw = (time: number) => {
       },
       scale: [1, sin(smallTime) * 0.5 + 1, 1],
     }),
-
-    u_Texture: smallTex(data),
+    u_Texture: updateTexture(gl, { ...redTex, data: redData }),
+    u_SecondTexture: updateTexture(gl, { ...blueTex, data: blueData }),
   })
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
