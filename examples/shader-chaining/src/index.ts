@@ -1,27 +1,15 @@
 import {
+  basicVert,
   createFramebuffer,
+  createTexture,
   initProgram,
   quadBuffer,
   simpleRender,
-  textureLoader,
   webgl2Canvas,
 } from '@geomm/webgl'
 import { add } from '@geomm/dom'
 
 const MOUSE = { x: 0, y: 0 }
-
-const vert = `#version 300 es
-precision mediump float;
-
-in vec3 i_Position;
-in vec2 i_TexCoord;
-
-out vec2 v_TexCoord;
-
-void main(){
-  gl_Position = vec4(i_Position, 1.0);
-  v_TexCoord = i_TexCoord;
-}`
 
 const programFrag = `#version 300 es
 precision mediump float;
@@ -58,9 +46,9 @@ add(c)
 const {
   program,
   vao: programQuadVAO,
-  uniformSetters: programUniformSetters,
+  setters: programUniformSetters,
 } = initProgram(gl, {
-  vertShader: vert,
+  vertShader: basicVert,
   fragShader: programFrag,
   bufferFn: quadBuffer,
 })
@@ -68,20 +56,20 @@ const {
 const {
   program: outputProgram,
   vao: outputQuadVAO,
-  uniformSetters: outputUniformSetters,
+  setters: outputUniformSetters,
 } = initProgram(gl, {
-  vertShader: vert,
+  vertShader: basicVert,
   fragShader: outputFrag,
   bufferFn: quadBuffer,
 })
 
-const textureFactory = textureLoader(gl)(
-  programRes.x,
-  programRes.y,
-  'RGBA',
-  'RGBA',
-)
-const renderTex = textureFactory(null) as WebGLTexture
+const renderTex = createTexture(gl, {
+  name: 'u_Render',
+  width: programRes.x,
+  height: programRes.y,
+  type: 'RGBA',
+  format: 'RGBA',
+})
 
 const fbo = createFramebuffer(gl, renderTex)
 
@@ -94,7 +82,7 @@ const outputUniforms = {
   u_Texture: renderTex,
 }
 
-simpleRender(gl, false, [
+simpleRender(gl, true, [
   {
     vao: programQuadVAO,
     program: program,
@@ -106,9 +94,7 @@ simpleRender(gl, false, [
   {
     vao: outputQuadVAO,
     program: outputProgram,
-    uniforms: {
-      ...outputUniforms,
-    },
+    uniforms: outputUniforms,
     setters: outputUniformSetters,
   },
 ])
