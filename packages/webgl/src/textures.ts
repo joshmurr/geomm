@@ -10,30 +10,17 @@ export const createTexture = (
   const texture = gl.createTexture()
 
   if (texture === null) throw Error('Error creating texture.')
+  textureUnitMap.push(name)
+
+  filter = filter || 'NEAREST'
+  wrap = wrap || 'CLAMP_TO_EDGE'
 
   gl.bindTexture(gl.TEXTURE_2D, texture)
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_MAG_FILTER,
-    gl[filter || 'NEAREST'] as GLenum,
-  )
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_MIN_FILTER,
-    gl[filter || 'NEAREST'] as GLenum,
-  )
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_WRAP_S,
-    gl[wrap || 'CLAMP_TO_EDGE'] as GLenum,
-  )
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_WRAP_T,
-    gl[wrap || 'CLAMP_TO_EDGE'] as GLenum,
-  )
-
-  textureUnitMap.push(name)
+  /* gl.activeTexture(gl.TEXTURE0 + textureUnitMap.indexOf(name)) */
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[filter] as GLenum)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl[filter] as GLenum)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl[wrap] as GLenum)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[wrap] as GLenum)
 
   const ret: TextureOptsOut = {
     name,
@@ -63,10 +50,9 @@ export const updateTexture = (gl: WGL2RC, opts: TextureOptsOut) => {
     height || 1,
     0,
     gl[format] as GLenum,
-    gl.UNSIGNED_BYTE,
+    gl[type.includes('F') ? 'FLOAT' : 'UNSIGNED_BYTE'],
     data || null,
   )
-  console.log(opts)
   return opts
 }
 
@@ -104,111 +90,4 @@ export const textureLoader = (gl: WGL2RC) => {
     }
   }
   return genericTextureLoader
-}
-
-export const textureMap = {
-  R8: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Uint8Array | Float32Array,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.R8,
-      w,
-      h,
-      0,
-      gl.RED,
-      gl.UNSIGNED_BYTE,
-      data,
-    ),
-  RGB: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Uint8Array | Float32Array,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGB8,
-      w,
-      h,
-      0,
-      gl.RGB,
-      gl.UNSIGNED_BYTE,
-      data,
-    ),
-  RGBA: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Uint8Array | Float32Array,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      w,
-      h,
-      0,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      data,
-    ),
-  RGBA16F: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Float32Array | null,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA16F,
-      w,
-      h,
-      0,
-      gl.RGBA,
-      gl.FLOAT,
-      data,
-    ),
-  R32F: (gl: WGL2RC, w: number, h: number, data: Float32Array | null): void =>
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, w, h, 0, gl.RED, gl.FLOAT, data),
-  RGBA32F: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Float32Array | null,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32F,
-      w,
-      h,
-      0,
-      gl.RGBA,
-      gl.FLOAT,
-      data,
-    ),
-  LUMINANCE: (
-    gl: WGL2RC,
-    w: number,
-    h: number,
-    data: Float32Array | null,
-  ): void =>
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.LUMINANCE,
-      w,
-      h,
-      0,
-      gl.LUMINANCE,
-      gl.UNSIGNED_BYTE,
-      data,
-    ),
 }

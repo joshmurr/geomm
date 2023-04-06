@@ -25,8 +25,6 @@ export const simpleRender = (
         resolution?.y || gl.canvas.height,
       )
 
-      console.log(uniforms)
-
       setUniforms(setters, {
         u_Time: time,
         ...uniforms,
@@ -48,5 +46,26 @@ export const initProgram = (
   const vao = createVAO(gl, buffer)
   const uniformSetters = getUniformSetters(gl, program)
 
-  return { program, vao, uniformSetters }
+  console.log(uniformSetters)
+
+  return { program, vao, setters: uniformSetters }
+}
+
+export const pingPong = (
+  gl: WGL2RC,
+  computePrograms: Program[],
+  iterations: number,
+  renderProgram: Program,
+) => {
+  for (let i = 0; i < iterations; i++) {
+    computePrograms.forEach(({ program, setters, uniforms }) => {
+      gl.useProgram(program)
+      setUniforms(setters, uniforms)
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    })
+  }
+
+  gl.useProgram(renderProgram.program)
+  setUniforms(renderProgram.setters, renderProgram.uniforms)
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 }

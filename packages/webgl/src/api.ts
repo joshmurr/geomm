@@ -100,3 +100,8 @@ export interface TextureOptsOut extends TextureOpts {
   texture: WebGLTexture
   unit: number
 }
+
+export interface TextureOptsMap extends TextureOptsOut {
+  width: number
+  height: number
+}

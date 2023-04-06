@@ -1,6 +1,6 @@
-import type { WGL2RC } from './api'
+import type { TextureOptsOut, WGL2RC } from './api'
 
-export const createFramebuffer = (gl: WGL2RC, target: WebGLTexture) => {
+export const createFramebuffer = (gl: WGL2RC, { texture }: TextureOptsOut) => {
   gl.bindTexture(gl.TEXTURE_2D, null)
   const fb = gl.createFramebuffer()
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
@@ -8,7 +8,7 @@ export const createFramebuffer = (gl: WGL2RC, target: WebGLTexture) => {
     gl.FRAMEBUFFER,
     gl.COLOR_ATTACHMENT0,
     gl.TEXTURE_2D,
-    target,
+    texture,
     0,
   )
   gl.bindFramebuffer(gl.FRAMEBUFFER, null)
