@@ -5,15 +5,12 @@
   "type": "module",
   "module": "./lib/index.js",
   "typings": "./lib/index.d.ts",
-  "keywords": [],
-  "author": "Josh Murr",
-  "license": "ISC",
   "scripts": {
     "build": "tsc --declaration"
   },
   "files": [
-    "./lib/*.js",
-    "./lib/*.d.ts"
+    "./lib/**/*.js",
+    "./lib/**/*.d.ts"
   ],
   "exports": {
     ".": {
@@ -26,6 +23,9 @@
       "default": "./lib/core.js"
     }
   },
+  "keywords": [],
+  "author": "Josh Murr",
+  "license": "ISC",
   "dependencies": {
     "@geomm/api": "^1.0.0",
     "@geomm/maths": "^1.0.0"
