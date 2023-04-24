@@ -66,11 +66,13 @@ export interface PrimitiveBuffer {
   indices: IndicesBuffer
 }
 
+/* TODO: Progam props, what is required here? What can be inferred? */
 export interface Program {
   vao: WebGLVertexArrayObject
   program: WebGLProgram
   uniforms: StringMap<unknown>
   setters: Setters
+  viewport: number[]
   fbo?: WebGLFramebuffer | null
   resolution?: { x: number; y: number } | null
 }
@@ -89,6 +91,7 @@ export interface TextureOpts {
   width?: number
   height?: number
   type: keyof WGL2RC
+  internalFormat: keyof WGL2RC
   format: keyof WGL2RC
   unit?: number
   filter?: keyof WGL2RC

@@ -46,26 +46,40 @@ export const initProgram = (
   const vao = createVAO(gl, buffer)
   const uniformSetters = getUniformSetters(gl, program)
 
-  console.log(uniformSetters)
-
   return { program, vao, setters: uniformSetters }
 }
 
 export const pingPong = (
   gl: WGL2RC,
   computePrograms: Program[],
-  iterations: number,
   renderProgram: Program,
+  loop: boolean,
+  delay = 0,
 ) => {
-  for (let i = 0; i < iterations; i++) {
-    computePrograms.forEach(({ program, setters, uniforms }) => {
-      gl.useProgram(program)
-      setUniforms(setters, uniforms)
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-    })
-  }
+  const draw = () => {
+    computePrograms.forEach(
+      ({ program, setters, uniforms, vao, viewport, fbo }) => {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo || null)
+        gl.bindVertexArray(vao)
+        gl.useProgram(program)
+        setUniforms(setters, uniforms)
 
-  gl.useProgram(renderProgram.program)
-  setUniforms(renderProgram.setters, renderProgram.uniforms)
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+        gl.viewport(0, 0, viewport[0], viewport[1])
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0)
+      },
+    )
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+    gl.bindVertexArray(renderProgram.vao)
+    gl.useProgram(renderProgram.program)
+    setUniforms(renderProgram.setters, renderProgram.uniforms)
+    gl.viewport(0, 0, renderProgram.viewport[0], renderProgram.viewport[1])
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0)
+
+    if (loop) {
+      if (delay > 0) setTimeout(() => requestAnimationFrame(draw), delay)
+      else requestAnimationFrame(draw)
+    }
+  }
+  requestAnimationFrame(draw)
 }

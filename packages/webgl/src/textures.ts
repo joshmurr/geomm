@@ -5,7 +5,18 @@ export const textureUnitMap: string[] = []
 
 export const createTexture = (
   gl: WGL2RC,
-  { name, width, height, filter, wrap, data, ...rest }: TextureOpts,
+  {
+    name,
+    width,
+    height,
+    filter,
+    wrap,
+    format,
+    internalFormat,
+    type,
+    data,
+    ...rest
+  }: TextureOpts,
 ) => {
   const texture = gl.createTexture()
 
@@ -30,6 +41,9 @@ export const createTexture = (
     filter,
     wrap,
     data,
+    format,
+    internalFormat,
+    type,
     texture,
     ...rest,
   }
@@ -40,17 +54,17 @@ export const createTexture = (
 }
 
 export const updateTexture = (gl: WGL2RC, opts: TextureOptsOut) => {
-  const { texture, width, height, type, format, data } = opts
+  const { texture, width, height, internalFormat, format, type, data } = opts
   gl.bindTexture(gl.TEXTURE_2D, texture)
   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
-    gl[type] as GLenum,
+    gl[internalFormat] as GLenum,
     width || 1,
     height || 1,
     0,
     gl[format] as GLenum,
-    gl[type.includes('F') ? 'FLOAT' : 'UNSIGNED_BYTE'],
+    gl[type] as GLenum,
     data || null,
   )
   return opts
