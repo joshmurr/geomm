@@ -1,3 +1,5 @@
+/* A re-implementation of the demo: https://www.ibiblio.org/e-notes/webgl/gpu/flat_wave.htm */
+
 import { add } from '@geomm/dom'
 import {
   basicVert,
@@ -11,6 +13,11 @@ import {
 
 const [c, gl] = webgl2Canvas(512, 512)
 add(c)
+
+const ext = gl.getExtension('EXT_color_buffer_float')
+if (!ext) {
+  alert('need EXT_color_buffer_float')
+}
 
 const programFrag = `#version 300 es
 precision highp float;
@@ -32,7 +39,7 @@ void main() {
      texture(u_samp1, vec2(v_TexCoord.x - d, v_TexCoord.y) ).r +
      - 4.*u1)*dth2;
 
-  OUTCOLOUR = vec4(1., 0., 0., 0. );
+  OUTCOLOUR = vec4(u, 0., 0., 0. );
 }
 `
 
@@ -67,21 +74,20 @@ for (let i = 0; i < n; i++) {
   }
 }
 
-gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
+/* gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) */
 const textures = [...Array(3)].map((_, i) =>
   createTexture(gl, {
     name: `u_Tex${i}`,
     width: n,
     height: n,
-    type: 'RGBA16F',
+    internalFormat: 'RGBA32F',
     format: 'RGBA',
+    type: 'FLOAT',
     data: pix,
   }),
 )
 
-const fbos = [...Array(3)].map((_, i) =>
-  createFramebuffer(gl, textures[(i + 1) % textures.length]),
-)
+const fbos = [...Array(3)].map((_, i) => createFramebuffer(gl, textures[i]))
 
 if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
   alert(
@@ -100,7 +106,8 @@ const compute1 = {
     u_samp: textures[0],
     u_samp1: textures[1],
   },
-  fbo: fbos[1],
+  viewport: [c.width, c.height],
+  fbo: fbos[2],
 }
 const compute2 = {
   ...initProgram(gl, {
@@ -112,7 +119,8 @@ const compute2 = {
     u_samp: textures[1],
     u_samp1: textures[2],
   },
-  fbo: fbos[2],
+  viewport: [c.width, c.height],
+  fbo: fbos[0],
 }
 const compute3 = {
   ...initProgram(gl, {
@@ -124,18 +132,9 @@ const compute3 = {
     u_samp: textures[2],
     u_samp1: textures[0],
   },
-  fbo: fbos[0],
+  viewport: [c.width, c.height],
+  fbo: fbos[1],
 }
-
-console.log(compute2)
-
-/* const renderTex = createTexture(gl, { */
-/*   name: 'u_Render', */
-/*   width: c.width, */
-/*   height: c.height, */
-/*   type: 'RGBA', */
-/*   format: 'RGBA', */
-/* }) */
 
 const outputProgramDesc = {
   ...initProgram(gl, {
@@ -146,22 +145,7 @@ const outputProgramDesc = {
   uniforms: {
     u_samp: textures[0],
   },
+  viewport: [c.width, c.height],
 }
 
-pingPong(gl, [compute1, compute2, compute3], 1, outputProgramDesc)
-
-/* simpleRender(gl, false, [
-  {
-    vao: programQuadVAO,
-    program: program,
-    uniforms: programUniforms,
-    setters: programUniformSetters,
-    fbo,
-  },
-  {
-    vao: outputQuadVAO,
-    program: outputProgram,
-    uniforms: outputUniforms,
-    setters: outputUniformSetters,
-  },
-]) */
+pingPong(gl, [compute1, compute2, compute3], outputProgramDesc, true)
