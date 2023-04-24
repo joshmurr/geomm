@@ -11,7 +11,9 @@ import {
   webgl2Canvas,
 } from '@geomm/webgl'
 
-const [c, gl] = webgl2Canvas(512, 512)
+const RES = { width: 128, height: 128 }
+const SCREEN = { width: 1024, height: 1024 }
+const [c, gl] = webgl2Canvas(SCREEN.width, SCREEN.height)
 add(c)
 
 const ext = gl.getExtension('EXT_color_buffer_float')
@@ -25,7 +27,7 @@ uniform sampler2D u_samp;
 uniform sampler2D u_samp1;
 in vec2 v_TexCoord;
 
-const float d = 1./512., dth2 = .2;
+const float d = 1./${RES.width}., dth2 = .2;
 
 out vec4 OUTCOLOUR;
 
@@ -57,7 +59,7 @@ void main() {
 }
 `
 
-const n = c.width
+const n = RES.width
 const n1 = n - 1
 const h = 1 / n1
 
@@ -65,8 +67,8 @@ let t = 0
 const pix = new Float32Array(4 * n * n)
 for (let i = 0; i < n; i++) {
   for (let j = 0; j < n; j++) {
-    const x = h * (j - n / 2),
-      y = h * (i - n / 2)
+    const x = h * (j - n / 2)
+    const y = h * (i - n / 2)
     pix[t++] = 50 * Math.exp(-5000 * (x * x + y * y))
     pix[t++] = 0
     pix[t++] = 0
@@ -78,8 +80,8 @@ for (let i = 0; i < n; i++) {
 const textures = [...Array(3)].map((_, i) =>
   createTexture(gl, {
     name: `u_Tex${i}`,
-    width: n,
-    height: n,
+    width: RES.width,
+    height: RES.height,
     internalFormat: 'RGBA32F',
     format: 'RGBA',
     type: 'FLOAT',
@@ -106,7 +108,7 @@ const compute1 = {
     u_samp: textures[0],
     u_samp1: textures[1],
   },
-  viewport: [c.width, c.height],
+  viewport: [RES.width, RES.height],
   fbo: fbos[2],
 }
 const compute2 = {
@@ -119,7 +121,7 @@ const compute2 = {
     u_samp: textures[1],
     u_samp1: textures[2],
   },
-  viewport: [c.width, c.height],
+  viewport: [RES.width, RES.height],
   fbo: fbos[0],
 }
 const compute3 = {
@@ -132,7 +134,7 @@ const compute3 = {
     u_samp: textures[2],
     u_samp1: textures[0],
   },
-  viewport: [c.width, c.height],
+  viewport: [RES.width, RES.height],
   fbo: fbos[1],
 }
 
@@ -145,7 +147,7 @@ const outputProgramDesc = {
   uniforms: {
     u_samp: textures[0],
   },
-  viewport: [c.width, c.height],
+  viewport: [SCREEN.width, SCREEN.height],
 }
 
-pingPong(gl, [compute1, compute2, compute3], outputProgramDesc, true)
+pingPong(gl, [compute1, compute2, compute3], outputProgramDesc, true, 50)
