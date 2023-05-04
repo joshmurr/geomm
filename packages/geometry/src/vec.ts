@@ -8,3 +8,9 @@ export const normalize = (a: Vec) => {
   const len = Math.sqrt(dot(a, a))
   return vec(a.x / len, a.y / len)
 }
+
+export const dist = (a: Vec, b: Vec) => {
+  const dx = a.x - b.x
+  const dy = a.y - b.y
+  return Math.sqrt(dx * dx + dy * dy)
+}
