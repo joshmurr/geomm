@@ -14,3 +14,9 @@ export const dist = (a: Vec, b: Vec) => {
   const dy = a.y - b.y
   return Math.sqrt(dx * dx + dy * dy)
 }
+
+export const lerp = (a: Vec, b: Vec, t: number) => {
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  return vec(a.x + dx * t, a.y + dy * t)
+}
