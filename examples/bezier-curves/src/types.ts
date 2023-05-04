@@ -4,7 +4,9 @@ export type Curve = [Vec, Vec, Vec, Vec]
 
 export type CurveDesc = {
   id: string | null
-  points: Curve
+  curve: Curve
+  prev: Curve
+  frames: Curve[]
 }
 
 export type PointDesc = {
@@ -14,5 +16,7 @@ export type PointDesc = {
 
 export type State = {
   selected: PointDesc
+  animate: boolean
+  frame: number
   curves: CurveDesc[]
 }

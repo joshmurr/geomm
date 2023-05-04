@@ -27,16 +27,16 @@ export const drawLine = (
 
 export const drawCurve = (
   ctx: CanvasRenderingContext2D,
-  v1: Vec,
+  start: Vec,
   v2: Vec,
   v3: Vec,
-  v4: Vec,
+  end: Vec,
   color = 'black',
 ) => {
   ctx.strokeStyle = color
   ctx.beginPath()
-  ctx.moveTo(v1.x, v1.y)
-  ctx.bezierCurveTo(v2.x, v2.y, v3.x, v3.y, v4.x, v4.y)
+  ctx.moveTo(start.x, start.y)
+  ctx.bezierCurveTo(v2.x, v2.y, v3.x, v3.y, end.x, end.y)
   ctx.stroke()
 }
 
