@@ -9,7 +9,7 @@ export const genUUID = (len: number) =>
     .substring(2, 2 + len)
 
 export const defaultState: State = {
-  selected: { id: null, pointIdx: -1 },
+  selected: [],
   animate: false,
   frame: 0,
   curves: [

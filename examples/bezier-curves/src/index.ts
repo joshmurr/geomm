@@ -43,7 +43,7 @@ genFrames.addEventListener('click', () => {
   })
 })
 const animate = add('button') as HTMLButtonElement
-animate.innerText = 'animate'
+animate.innerText = 'Animate'
 animate.addEventListener('click', () => (state.animate = !state.animate))
 
 const draw = () => {
@@ -78,12 +78,13 @@ const draw = () => {
 
 const handleMouseMove = (e: MouseEvent) => {
   MOUSE = vec(e.clientX, e.clientY)
-  if (state.selected.id !== null) {
-    const { id, pointIdx } = state.selected
-    const curve = state.curves.find((c) => c.id === id)
-    if (curve) {
-      curve.curve[pointIdx] = MOUSE
-    }
+  if (state.selected.length > 0) {
+    state.selected.forEach(({ id, pointIdx }) => {
+      const curve = state.curves.find((c) => c.id === id)
+      if (curve) {
+        curve.curve[pointIdx] = MOUSE
+      }
+    })
   }
 }
 
@@ -93,14 +94,14 @@ const handleMouseDown = (e: MouseEvent) => {
   state.curves.forEach(({ id, curve }) => {
     curve.forEach((point, i) => {
       if (dist(p, point) < 50) {
-        state.selected = { id, pointIdx: i }
+        state.selected.push({ id, pointIdx: i })
       }
     })
   })
 }
 
 const handleMouseUp = () => {
-  state.selected = { id: null, pointIdx: -1 }
+  state.selected = []
 }
 
 c.addEventListener('mousemove', handleMouseMove)

@@ -15,7 +15,7 @@ export type PointDesc = {
 }
 
 export type State = {
-  selected: PointDesc
+  selected: PointDesc[]
   animate: boolean
   frame: number
   curves: CurveDesc[]
