@@ -50,7 +50,8 @@
   "dependencies": {
     "@geomm/api": "^1.0.0",
     "@geomm/core": "^1.0.0",
+    "@geomm/dom": "^1.0.0",
     "@geomm/geometry": "^1.0.0",
-    "@geomm/dom": "^1.0.0"
+    "@geomm/maths": "^1.0.2"
   }
 }
