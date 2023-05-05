@@ -11,8 +11,8 @@ import {
   webgl2Canvas,
 } from '@geomm/webgl'
 
-const RES = { width: 128, height: 128 }
-const SCREEN = { width: 1024, height: 1024 }
+const RES = { width: 512, height: 512 }
+const SCREEN = { width: 512, height: 512 }
 const [c, gl] = webgl2Canvas(SCREEN.width, SCREEN.height)
 add(c)
 
@@ -82,7 +82,7 @@ const textures = [...Array(3)].map((_, i) =>
     name: `u_Tex${i}`,
     width: RES.width,
     height: RES.height,
-    internalFormat: 'RGBA32F',
+    internalFormat: 'RGBA16F',
     format: 'RGBA',
     type: 'FLOAT',
     data: pix,
