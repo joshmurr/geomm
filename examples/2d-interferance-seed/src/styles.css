@@ -1,0 +1,11 @@
+:root {
+  --cell-size: 3px;
+}
+table {
+  font-size: xx-small;
+}
+tr {
+}
+td {
+  padding: var(--cell-size);
+}
