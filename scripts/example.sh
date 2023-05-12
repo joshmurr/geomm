@@ -17,7 +17,7 @@ new_example() {
 	mkdir -p "./$EXAMPLE_DIR/src"
 
 	cat <<EOF >"./$EXAMPLE_DIR"/src/index.ts
-  const sanityCheck = (please: string): void => {
+const sanityCheck = (please: string): void => {
   console.log(\`Will you work \${please}.\`)
 }
 
@@ -71,6 +71,11 @@ EOF
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>$1 · @geomm</title>
 	<style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
 	</style>
 </head>
 <body>
