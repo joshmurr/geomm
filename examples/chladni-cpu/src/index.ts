@@ -1,5 +1,5 @@
-import { add, canvas } from '@geomm/dom'
-import { type Vec, vec } from '@geomm/geometry'
+import { appendEl, canvas } from '@geomm/dom'
+import { type Vec, vec, toScreen } from '@geomm/geometry'
 import { abs, PI, randRange, sin } from '@geomm/maths'
 import { makeGui } from './gui'
 
@@ -45,7 +45,7 @@ const chladni = (v: Vec, a: number, b: number, m: number, n: number) =>
   b * sin(PI * m * v.x * aspect) * sin(PI * n * v.y)
 
 const c = canvas(...size)
-add(c)
+appendEl(c)
 
 const particles = Array.from(
   { length: settings.nParticles.max as number },
@@ -85,10 +85,8 @@ const move = (p: Particle) => {
   bound(p)
 }
 
-const toScreen = (v: Vec) => vec(v.x * c.width, v.y * c.height)
-
 const drawParticle = (p: Particle, ctx: CanvasRenderingContext2D) => {
-  const { x, y } = toScreen(p.pos)
+  const { x, y } = toScreen(p.pos, vec(c.width, c.height))
   ctx.fillRect(x, y, 2, 2)
 }
 

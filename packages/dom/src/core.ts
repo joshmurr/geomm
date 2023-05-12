@@ -24,8 +24,12 @@ export const createEl = <T extends HTMLElement>(
   return el
 }
 
-export const add = (el: HTMLElement | string) => {
+export const appendEl = (
+  el: HTMLElement | string,
+  parent?: HTMLElement | null,
+) => {
   const element = typeof el === 'string' ? createEl<HTMLElement>(el) : el
-  document.body.appendChild(element)
+  const p = parent || document.body
+  p.appendChild(element)
   return element
 }

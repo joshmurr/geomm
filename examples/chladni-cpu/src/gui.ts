@@ -1,4 +1,4 @@
-import { add, createEl } from '@geomm/dom'
+import { appendEl, createEl } from '@geomm/dom'
 import type { Settings } from '.'
 
 export const makeGui = (settings: Settings) => {
@@ -47,5 +47,5 @@ export const makeGui = (settings: Settings) => {
     }
   })
 
-  add(gui)
+  appendEl(gui)
 }
