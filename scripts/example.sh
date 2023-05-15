@@ -22,6 +22,8 @@ const sanityCheck = (please: string): void => {
 }
 
 sanityCheck("for me.")
+
+export {}
 EOF
 
 	echo "writing package.json..."
