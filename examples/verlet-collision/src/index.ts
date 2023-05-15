@@ -1,6 +1,6 @@
 import { appendEl, createEl } from '@geomm/dom'
 import { add, mag, scale, sub, vec, Vec } from '@geomm/geometry'
-import { randRange, sqrt } from '@geomm/maths'
+import { min, randRange, sqrt } from '@geomm/maths'
 
 type Particle = {
   pos: Vec
@@ -11,11 +11,11 @@ type Particle = {
 }
 
 const settings = {
-  N_PARTICLES: 512,
+  N_PARTICLES: 1024,
 }
 
-const SIZE = vec(512, 512)
-const GRAVITY = vec(0, 300)
+const SIZE = vec(window.innerWidth, window.innerHeight)
+const GRAVITY = vec(0, 10)
 
 const c = createEl('canvas', {
   width: SIZE.x,
@@ -29,7 +29,7 @@ const particles = Array.from({ length: settings.N_PARTICLES }).map(() => {
     pos: initialPos,
     prevPos: initialPos,
     acc: vec(0, 0),
-    mass: 8,
+    mass: randRange(5, 25),
     col: '#000',
   }
 })
@@ -53,7 +53,7 @@ const verlet = (p: Particle, dt: number) => {
   p.acc = vec(0, 0)
   p.pos = newPos
   p.col = `hsl(${mag(pos) * 0.1 + 210}, 100%, ${Math.floor(
-    mag(displacement) * 30,
+    mag(displacement) * 5,
   )}%)`
 }
 
@@ -90,9 +90,11 @@ const circularBound = (p: Particle) => {
   const v = sub(centre, pos)
   const dist = mag(v)
 
-  if (dist > centre.x - mass) {
+  const smallerSide = min(...Object.values(centre))
+
+  if (dist > smallerSide - mass) {
     const n = scale(v, 1 / dist)
-    p.pos = sub(centre, scale(n, centre.x - mass))
+    p.pos = sub(centre, scale(n, smallerSide - mass))
   }
 }
 
@@ -106,16 +108,16 @@ const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
   particles.slice(i + 1).forEach((p2) => {
     const { pos: pos2, mass: mass2 } = p2
 
-    const v = sub(pos, pos2)
-    const distSq = v.x * v.x + v.y * v.y
+    const dir = sub(pos, pos2)
+    const distSq = dir.x * dir.x + dir.y * dir.y
     const minDist = mass + mass2
 
     if (distSq < minDist * minDist) {
       const dist = sqrt(distSq)
-      const n = scale(v, 1 / dist)
+      const n = scale(dir, 1 / dist)
       const massRatio1 = mass / minDist
       const massRatio2 = mass2 / minDist
-      const delta = 0.99 * (dist - minDist)
+      const delta = 0.5 * (dist - minDist)
 
       p.pos = sub(pos, scale(n, massRatio2 * delta))
       p2.pos = add(pos2, scale(n, massRatio1 * delta))
