@@ -7,8 +7,8 @@ import {
   scale,
   sub,
   toScreen,
-  type Vec,
   vec,
+  Vec,
 } from '@geomm/geometry'
 import { randRange } from '@geomm/maths'
 

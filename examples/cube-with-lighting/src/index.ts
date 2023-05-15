@@ -6,7 +6,6 @@ import {
   shaderProgram,
   webgl2Canvas,
 } from '@geomm/webgl'
-import { add } from '@geomm/dom'
 import {
   cos,
   identityMat,
@@ -17,6 +16,7 @@ import {
   viewMat,
 } from '@geomm/maths'
 import { nIndices } from '@geomm/geometry'
+import { appendEl } from '@geomm/dom'
 
 const vert = `#version 300 es
 precision mediump float;
@@ -63,7 +63,7 @@ void main(){
 }`
 
 const [c, gl] = webgl2Canvas(512, 512)
-add(c)
+appendEl(c)
 
 const program = shaderProgram(gl, vert, frag)
 
