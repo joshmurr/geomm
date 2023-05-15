@@ -8,12 +8,14 @@ export const normalize = (a: Vec) => {
   const len = Math.sqrt(dot(a, a))
   return vec(a.x / len, a.y / len)
 }
+export const mag = (a: Vec) => Math.sqrt(dot(a, a))
 
-export const distance = (a: Vec, b: Vec) => {
+export const distanceSq = (a: Vec, b: Vec) => {
   const dx = a.x - b.x
   const dy = a.y - b.y
-  return Math.sqrt(dx * dx + dy * dy)
+  return dx * dx + dy * dy
 }
+export const distance = (a: Vec, b: Vec) => Math.sqrt(distanceSq(a, b))
 
 export const lerp = (a: Vec, b: Vec, t: number) => {
   const dx = b.x - a.x
