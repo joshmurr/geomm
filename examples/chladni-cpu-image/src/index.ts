@@ -1,7 +1,7 @@
 import { appendEl, canvas } from '@geomm/dom'
 import { type Vec, vec, toScreen } from '@geomm/geometry'
 import { abs, PI, randInt, randRange, sin } from '@geomm/maths'
-import seed from './11.png'
+import seed from './09.png'
 import { makeGui } from './gui'
 
 type Particle = {
@@ -82,9 +82,9 @@ const settings: Settings = {
 
 const bound = (p: Particle) => {
   if (p.pos.x < 0) p.pos.x = randInt(0, size.x)
-  if (p.pos.x > 1) p.pos.x = randInt(0, size.x)
+  if (p.pos.x > size.x) p.pos.x = randInt(0, size.x)
   if (p.pos.y < 0) p.pos.y = randInt(0, size.y)
-  if (p.pos.y > 1) p.pos.y = randInt(0, size.y)
+  if (p.pos.y > size.y) p.pos.y = randInt(0, size.y)
 }
 
 const chladni = (v: Vec, a: number, b: number, m: number, n: number) =>
@@ -101,7 +101,7 @@ const move = (
 
   const pos = toScreen(p.pos, size)
   const eq = seed
-    ? seed[Math.floor(pos.x) + Math.floor(pos.y) * size.x] * 1.8
+    ? (1 - seed[Math.floor(pos.x) + Math.floor(pos.y) * size.x]) * 1.8
     : 1
   const di = displace ? getPixelFromCtx(displace, pos) : 1
 
@@ -157,6 +157,8 @@ const drawParticle = (p: Particle, ctx: CanvasRenderingContext2D) => {
   ctx.fillRect(x, y, 2, 2)
 }
 
+makeGui(settings)
+
 const init = (seed: number[]) => {
   const c = canvas(size.x, size.y)
   appendEl(c)
@@ -173,8 +175,6 @@ const init = (seed: number[]) => {
     (e) => (MOUSE = vec(e.offsetX, e.offsetY)),
   )
 
-  const gui = makeGui(settings)
-
   const particles = Array.from(
     { length: settings.nParticles.max as number },
     () => ({
@@ -188,7 +188,7 @@ const init = (seed: number[]) => {
     drawRadialGradient(displaceCtx, MOUSE, 100, 'white')
     /**/
     clearCtx(ctx)
-    const slice = particles.slice(0, settings.nParticles.val)
+    const slice = particles.slice(0, settings.nParticles.val as number)
     slice.forEach((p) => move(p, seed, displaceCtx))
     slice.forEach((p) => drawParticle(p, ctx))
 
