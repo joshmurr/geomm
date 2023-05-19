@@ -1,3 +1,4 @@
+import { appendEl } from '@geomm/dom'
 import {
   basicVert,
   createFramebuffer,
@@ -7,9 +8,6 @@ import {
   simpleRender,
   webgl2Canvas,
 } from '@geomm/webgl'
-import { add } from '@geomm/dom'
-
-const MOUSE = { x: 0, y: 0 }
 
 const programFrag = `#version 300 es
 precision mediump float;
@@ -41,7 +39,7 @@ void main(){
 
 const programRes = { x: 16, y: 16 }
 const [c, gl] = webgl2Canvas(512, 512)
-add(c)
+appendEl(c)
 
 const {
   program,
@@ -67,8 +65,9 @@ const renderTex = createTexture(gl, {
   name: 'u_Render',
   width: programRes.x,
   height: programRes.y,
-  type: 'RGBA',
+  internalFormat: 'RGBA',
   format: 'RGBA',
+  type: 'UNSIGNED_BYTE',
 })
 
 const fbo = createFramebuffer(gl, renderTex)
@@ -88,7 +87,7 @@ simpleRender(gl, true, [
     program: program,
     uniforms: programUniforms,
     setters: programUniformSetters,
-    resolution: programRes,
+    viewport: Object.values(programRes),
     fbo,
   },
   {
@@ -96,13 +95,7 @@ simpleRender(gl, true, [
     program: outputProgram,
     uniforms: outputUniforms,
     setters: outputUniformSetters,
+    viewport: [c.width, c.height],
+    fbo: null,
   },
 ])
-
-c.addEventListener('mousemove', function (e) {
-  const rect = this.getBoundingClientRect()
-  MOUSE.x = e.clientX - rect.left
-  MOUSE.y = rect.height - (e.clientY - rect.top) - 1
-  //MOUSE.x /= SCALE
-  //MOUSE.y /= SCALE
-})
