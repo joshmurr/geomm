@@ -1,6 +1,6 @@
 /* A re-implementation of the demo: https://www.ibiblio.org/e-notes/webgl/gpu/flat_wave.htm */
 
-import { add } from '@geomm/dom'
+import { appendEl } from '@geomm/dom'
 import {
   basicVert,
   createFramebuffer,
@@ -14,7 +14,7 @@ import {
 const RES = { width: 512, height: 512 }
 const SCREEN = { width: 512, height: 512 }
 const [c, gl] = webgl2Canvas(SCREEN.width, SCREEN.height)
-add(c)
+appendEl(c)
 
 const ext = gl.getExtension('EXT_color_buffer_float')
 if (!ext) {
@@ -77,7 +77,7 @@ for (let i = 0; i < n; i++) {
 }
 
 /* gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) */
-const textures = [...Array(3)].map((_, i) =>
+const textures = Array.from({ length: 3 }, (_, i) =>
   createTexture(gl, {
     name: `u_Tex${i}`,
     width: RES.width,
@@ -89,7 +89,9 @@ const textures = [...Array(3)].map((_, i) =>
   }),
 )
 
-const fbos = [...Array(3)].map((_, i) => createFramebuffer(gl, textures[i]))
+const fbos = Array.from({ length: 3 }, (_, i) =>
+  createFramebuffer(gl, textures[i]),
+)
 
 if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
   alert(

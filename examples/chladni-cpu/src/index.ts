@@ -8,11 +8,15 @@ type Particle = {
   stochasticAmplitude: number
 }
 
-type Setting = {
-  val: number | Vec | boolean | readonly [number, number]
-  min?: number | Vec | boolean
-  max?: number | Vec | boolean
-}
+type Setting =
+  | {
+      val: number
+      min: number
+      max: number
+    }
+  | {
+      val: boolean
+    }
 
 export type Settings = {
   [key: string]: Setting
@@ -27,7 +31,7 @@ const settings: Settings = {
     min: 1000,
     max: 10000,
   },
-  drawHeatmap: { val: false, min: false, max: true },
+  drawHeatmap: { val: false },
   minWalk: { val: 0.002, min: 0.0001, max: 0.01 },
   A: { val: 0.02, min: 0.0001, max: 0.1 },
   a: { val: 2, min: 0.1, max: 10 },
