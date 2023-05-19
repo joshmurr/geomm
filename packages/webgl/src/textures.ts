@@ -49,28 +49,38 @@ export const createTexture = (
     ...rest,
   }
 
-  if (data !== null) updateTexture(gl, ret)
+  /* if (data !== null) */ updateTexture(gl, ret)
 
   return ret
 }
 
 export const updateTexture = (gl: WGL2RC, opts: TextureOptsOut) => {
-  const { texture, width, height, internalFormat, format, type, data } = opts
+  const { texture, internalFormat, format, type } = opts
+  let { width, height, data } = opts
   const level = 0
   const border = 0
-  const pixel = new Uint8Array([0, 0, 255, 255])
+  const pixel = [0, 0, 255, 255]
+  width = width || 1
+  height = height || 1
+  data =
+    data ||
+    new Uint8ClampedArray(
+      Array.from({ length: width * height }, () => pixel).flat(),
+    )
   gl.bindTexture(gl.TEXTURE_2D, texture)
   gl.texImage2D(
     gl.TEXTURE_2D,
     level,
     gl[internalFormat] as GLenum,
-    width || 1,
-    height || 1,
+    width,
+    height,
     border,
     gl[format] as GLenum,
     gl[type] as GLenum,
-    data || pixel,
+    data,
   )
+
+  console.log(width, height)
 
   if (typeof data === 'string') {
     const image = new Image()

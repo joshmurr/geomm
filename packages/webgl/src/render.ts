@@ -11,7 +11,6 @@ export const simpleRender = (
   programs.forEach(({ vao, program, fbo, uniforms, setters, resolution }) => {
     const draw = (time: number) => {
       gl.useProgram(program)
-
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbo || null)
 
       gl.bindVertexArray(vao)
