@@ -11,7 +11,6 @@ export const makeGui = (settings: Settings) => {
     entry.appendChild(label)
     switch (typeof val) {
       case 'boolean':
-        console.log(val)
         entry.appendChild(
           createEl('input', {
             type: 'checkbox',

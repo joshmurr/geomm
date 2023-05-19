@@ -1,6 +1,6 @@
 import { appendEl, canvas } from '@geomm/dom'
 import { type Vec, vec, toScreen } from '@geomm/geometry'
-import { abs, PI, randRange, sin } from '@geomm/maths'
+import { abs, PI, randInt, randRange, sin } from '@geomm/maths'
 import seed from './11.png'
 import { makeGui } from './gui'
 
@@ -32,7 +32,7 @@ const imageToGrayscaleArray = (img: HTMLImageElement) => {
     const g = data[i + 1]
     const b = data[i + 2]
     const avg = (r + g + b) / 3 / 255
-    const rescaled = avg // === 0 ? 0 : avg * 2 - 1
+    const rescaled = avg
     grayscale.push(rescaled)
   }
   return grayscale
@@ -47,7 +47,7 @@ const ctxToGrayscaleArray = (ctx: CanvasRenderingContext2D) => {
     const g = data[i + 1]
     const b = data[i + 2]
     const avg = (r + g + b) / 3 / 255
-    const rescaled = avg // === 0 ? 0 : avg * 2 - 1
+    const rescaled = avg
     grayscale.push(rescaled)
   }
   return grayscale
@@ -66,45 +66,53 @@ const size = vec(512, 512)
 
 const settings: Settings = {
   nParticles: {
-    val: 2000,
+    val: 5000,
     min: 1000,
     max: 10000,
   },
   drawHeatmap: { val: false, min: false, max: true },
-  minWalk: { val: 0.0002, min: 0.0001, max: 0.01 },
+  minWalk: { val: 2, min: 1, max: 10 },
   A: { val: 0.02, min: 0.0001, max: 0.1 },
   a: { val: 2, min: 0.1, max: 10 },
   b: { val: 1.2, min: 0.1, max: 10 },
   m: { val: 8, min: 0.1, max: 10 },
   n: { val: 4, min: 0.1, max: 10 },
-  vel: { val: 0.003, min: 0.0001, max: 0.1 },
+  vel: { val: 7, min: 1, max: 100 },
 }
 
 const bound = (p: Particle) => {
-  if (p.pos.x < 0) p.pos.x = 0
-  if (p.pos.x > 1) p.pos.x = 1
-  if (p.pos.y < 0) p.pos.y = 0
-  if (p.pos.y > 1) p.pos.y = 1
+  if (p.pos.x < 0) p.pos.x = randInt(0, size.x)
+  if (p.pos.x > 1) p.pos.x = randInt(0, size.x)
+  if (p.pos.y < 0) p.pos.y = randInt(0, size.y)
+  if (p.pos.y > 1) p.pos.y = randInt(0, size.y)
 }
-const move = (p: Particle, seed: number[] | CanvasRenderingContext2D) => {
-  const { vel, minWalk } = settings
+
+const chladni = (v: Vec, a: number, b: number, m: number, n: number) =>
+  /* chladni 2D closed-form solution - returns between -1 and 1 */
+  a * sin(PI * n * v.x) * sin(PI * m * v.y) +
+  b * sin(PI * m * v.x) * sin(PI * n * v.y)
+
+const move = (
+  p: Particle,
+  seed: number[] | null,
+  displace: CanvasRenderingContext2D | null,
+) => {
+  const { a, b, m, n, vel, minWalk } = settings
 
   const pos = toScreen(p.pos, size)
-  const eq = Array.isArray(seed)
-    ? seed[Math.floor(pos.x) + Math.floor(pos.y) * size.x]
-    : getPixelFromCtx(seed, pos)
+  const eq = seed
+    ? seed[Math.floor(pos.x) + Math.floor(pos.y) * size.x] * 1.8
+    : 1
+  const di = displace ? getPixelFromCtx(displace, pos) : 1
 
-  p.stochasticAmplitude = vel.val * abs(eq)
-  if (p.stochasticAmplitude <= minWalk.val) p.stochasticAmplitude = minWalk.val
+  const ch = chladni(p.pos, a.val, b.val, m.val, n.val) * 0.45
 
-  p.pos.x += randRange(
-    -p.stochasticAmplitude * 0.5,
-    p.stochasticAmplitude * 0.5,
-  )
-  p.pos.y += randRange(
-    -p.stochasticAmplitude * 0.5,
-    p.stochasticAmplitude * 0.5,
-  )
+  p.stochasticAmplitude = (vel.val * 0.001 + di * 0.0001) * abs(eq + ch)
+  if (p.stochasticAmplitude <= minWalk.val / 1000)
+    p.stochasticAmplitude = minWalk.val / 1000
+
+  p.pos.x += randRange(-p.stochasticAmplitude, p.stochasticAmplitude)
+  p.pos.y += randRange(-p.stochasticAmplitude, p.stochasticAmplitude)
 
   bound(p)
 }
@@ -137,7 +145,7 @@ const clearCtx = (ctx: CanvasRenderingContext2D) => {
 }
 
 const getPixelFromCtx = (ctx: CanvasRenderingContext2D, pos: Vec) => {
-  const imageData = ctx.getImageData(pos.x, pos.y, 1, 1)
+  const imageData = ctx.getImageData(pos.x || 0, pos.y || 0, 1, 1)
   const data = imageData.data
   return data[0] + data[1] + data[2] / 255 / 3
 }
@@ -156,16 +164,16 @@ const init = (seed: number[]) => {
   const testCanvas = canvas(size.x, size.y)
   appendEl(testCanvas)
 
-  const testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
-  testCtx.fillStyle = 'black'
-  testCtx.fillRect(0, 0, testCanvas.width, testCanvas.height)
+  const displaceCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
+  displaceCtx.fillStyle = 'black'
+  displaceCtx.fillRect(0, 0, testCanvas.width, testCanvas.height)
 
   window.addEventListener(
     'mousemove',
     (e) => (MOUSE = vec(e.offsetX, e.offsetY)),
   )
 
-  /* const gui = makeGui(settings) */
+  const gui = makeGui(settings)
 
   const particles = Array.from(
     { length: settings.nParticles.max as number },
@@ -176,20 +184,16 @@ const init = (seed: number[]) => {
   )
 
   const draw = (particles: Particle[], ctx: CanvasRenderingContext2D) => {
-    /* clearCtx(testCtx) */
-    /* drawRadialGradient(testCtx, MOUSE, 100, 'white') */
+    clearCtx(displaceCtx)
+    drawRadialGradient(displaceCtx, MOUSE, 100, 'white')
     /**/
     clearCtx(ctx)
     const slice = particles.slice(0, settings.nParticles.val)
-    slice.forEach((p) => move(p, seed))
+    slice.forEach((p) => move(p, seed, displaceCtx))
     slice.forEach((p) => drawParticle(p, ctx))
 
     requestAnimationFrame(() => draw(particles, ctx))
   }
 
   draw(particles, c.getContext('2d') as CanvasRenderingContext2D)
-
-  window.addEventListener('click', (e) =>
-    draw(particles, c.getContext('2d') as CanvasRenderingContext2D),
-  )
 }
