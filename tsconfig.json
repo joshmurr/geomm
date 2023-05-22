@@ -6,6 +6,7 @@
     { "path": "packages/dom" },
     { "path": "packages/geometry" },
     { "path": "packages/maths" },
+    { "path": "packages/algorithm" },
     { "path": "packages/webgl" }
   ]
 }

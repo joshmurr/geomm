@@ -14,7 +14,7 @@ type Particle = {
 }
 
 const settings = {
-  N_PARTICLES: 400,
+  N_PARTICLES: 300,
 }
 
 const SIZE = vec(512, 512)
