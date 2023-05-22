@@ -1,5 +1,5 @@
 import { appendEl, createEl } from '@geomm/dom'
-import { add, dot, mag, scale, sub, vec, Vec } from '@geomm/geometry'
+import { add, mag, scale, sub, vec, Vec } from '@geomm/geometry'
 import { min, randRange, sqrt } from '@geomm/maths'
 
 type Particle = {
@@ -25,14 +25,20 @@ const c = createEl('canvas', {
 }) as HTMLCanvasElement
 appendEl(c)
 
-const particles = Array.from({ length: settings.N_PARTICLES }).map(() => {
+const grayscaleColors = Array.from({ length: 256 }).map((_, i) => {
+  const hex = i.toString(16).padStart(2, '0')
+  const col = `#${hex}${hex}${hex}`
+  return col
+})
+
+const particles = Array.from({ length: settings.N_PARTICLES }).map((_, i) => {
   const initialPos = vec(randRange(0, SIZE.x), randRange(0, SIZE.y))
   return {
     pos: initialPos,
     prevPos: initialPos,
     acc: vec(0, 0),
     mass: 12,
-    col: '#aaa',
+    col: grayscaleColors[i % grayscaleColors.length],
   }
 })
 
@@ -55,25 +61,11 @@ const verlet = (p: Particle, dt: number) => {
   const newPos = add(pos, add(vel, acceleration))
   p.acc = vec(0, 0)
   p.pos = newPos
-  /* p.col = `hsl(${mag(pos) * 0.1 + 210}, 100%, ${Math.floor( mag(displacement) * 5,)}%)` */
 }
 
 const applyForce = (p: Particle, force: Vec) => {
   const { acc, mass } = p
   p.acc = add(acc, scale(force, 1 / mass))
-}
-
-const accelerate = (p: Particle, dt: number) => {
-  const { acc } = p
-  p.pos = add(p.pos, scale(acc, dt * dt))
-  p.acc = vec(0, 0)
-}
-
-const inertia = (p: Particle) => {
-  const { pos, prevPos } = p
-  const tPos = sub(scale(pos, 2), prevPos)
-  p.prevPos = pos
-  p.pos = tPos
 }
 
 const bound = (p: Particle) => {
@@ -140,16 +132,11 @@ const updateParticle = (p: Particle, dt: number) => {
   verlet(p, dt)
 }
 
-const checkCollisions = (
-  p: Particle,
-  i: number,
-  particles: Particle[],
-  preserveImpule: boolean,
-) => {
-  const { pos, prevPos, mass } = p
+const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
+  const { pos, mass } = p
 
   particles.slice(i + 1).forEach((p2) => {
-    const { pos: pos2, prevPos: prevPos2, mass: mass2 } = p2
+    const { pos: pos2, mass: mass2 } = p2
 
     const dir = sub(pos, pos2)
     const distSq = dir.x * dir.x + dir.y * dir.y
@@ -158,46 +145,24 @@ const checkCollisions = (
     if (distSq < minDist * minDist) {
       const dist = sqrt(distSq)
       const n = scale(dir, 1 / dist)
-      /* const massRatio1 = mass / minDist */
-      /* const massRatio2 = mass2 / minDist */
+
       const delta = (0.5 * (dist - minDist)) / dist
 
-      const v1 = sub(pos, prevPos)
-      const v2 = sub(pos2, prevPos2)
-
-      p.pos = sub(pos, scale(n, delta))
-      p2.pos = add(pos2, scale(n, delta))
-
-      if (preserveImpule) {
-        const f1 = (dot(v1, dir) * DAMPING) / distSq
-        const f2 = (dot(v2, dir) * DAMPING) / distSq
-
-        v1.x += f2 * dir.x - f1 * dir.x
-        v1.y += f2 * dir.y - f1 * dir.y
-        v2.x += f1 * dir.x - f2 * dir.x
-        v2.y += f1 * dir.y - f2 * dir.y
-
-        p.prevPos = sub(pos, v1)
-        p2.prevPos = sub(pos2, v2)
-      }
+      p.pos = sub(p.pos, scale(n, delta))
+      p2.pos = add(p2.pos, scale(n, delta))
     }
   })
 }
 
-const steps = 2
-const dt = 1 / steps
+const steps = 6
+const dt = 1
+
 const step = (particles: Particle[], ctx: CanvasRenderingContext2D) => {
-  for (let i = 0; i < steps; i++) {
+  for (let sub = 0; sub < steps; sub++) {
     particles.forEach((p) => applyForce(p, GRAVITY))
-    particles.forEach((p) => accelerate(p, dt))
-
-    particles.forEach((p, i) => checkCollisions(p, i, particles, false))
-    particles.forEach((p) => simpleBound(p))
-    particles.forEach((p) => inertia(p))
-
-    particles.forEach((p, i) => checkCollisions(p, i, particles, true))
+    particles.forEach((p, i) => checkCollisions(p, i, particles))
     particles.forEach((p) => bound(p))
-    /* particles.forEach((p) => updateParticle(p, dt)) */
+    particles.forEach((p) => updateParticle(p, dt / steps))
   }
 
   // Render

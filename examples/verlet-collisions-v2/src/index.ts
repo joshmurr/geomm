@@ -14,10 +14,10 @@ type Particle = {
 }
 
 const settings = {
-  N_PARTICLES: 300,
+  N_PARTICLES: 512,
 }
 
-const SIZE = vec(512, 512)
+const SIZE = vec(300, 600)
 const GRAVITY = vec(0, 0.01)
 
 const c = createEl('canvas', {
@@ -30,7 +30,7 @@ appendEl(c)
 const particles: Particle[] = []
 
 while (particles.length < settings.N_PARTICLES) {
-  const mass = randInt(5, 55)
+  const mass = randInt(5, 8)
   const initialPos = vec(
     randRange(mass, SIZE.x - mass),
     randRange(mass, SIZE.y - mass),
