@@ -1,0 +1,19 @@
+{
+  "name": "@geomm/algorithm",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "module": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "keywords": [],
+  "author": "Josh Murr",
+  "license": "ISC",
+  "scripts": {
+    "build": "tsc --declaration"
+  },
+  "dependencies": {
+    "@geomm/api": "^1.0.0",
+    "@geomm/geometry": "^1.0.2",
+    "@geomm/maths": "^1.0.2"
+  }
+}
