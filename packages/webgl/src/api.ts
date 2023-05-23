@@ -36,6 +36,7 @@ export interface IndicesBuffer {
 
 export interface BufferInfo {
   data: TypedArray
+  debug?: string
   buffer: WebGLBuffer
   target: GLenum
   usage: GLenum
@@ -45,15 +46,22 @@ export interface BufferInfo {
   type: GLenum
   location: GLenum
   stride: number
+  offset: number
 }
 
 export type Attributes = { [key: string]: BufferInfo }
 
+/* FIXME: wtf are Primitives? This naming convention is terrible */
 export interface PrimitiveRaw {
   name: string
   data: TypedArray
   numComponents: number
   size: number
+  buffer?: WebGLBuffer
+  stride?: number
+  usage?: GLenum
+  offset?: number
+  debug?: string
 }
 
 export interface PrimitiveData {
@@ -63,7 +71,7 @@ export interface PrimitiveData {
 
 export interface PrimitiveBuffer {
   attributes: BufferInfo[]
-  indices: IndicesBuffer
+  indices?: IndicesBuffer
 }
 
 /* TODO: Progam props, what is required here? What can be inferred? */
@@ -80,6 +88,10 @@ export interface Program {
 export interface ProgramInfo {
   vertShader: string
   fragShader: string
+  transformFeedbackVaryings?: string[]
+}
+
+export interface VAOProgramInfo extends ProgramInfo {
   bufferFn: (
     gl: WebGL2RenderingContext,
     program: WebGLProgram,

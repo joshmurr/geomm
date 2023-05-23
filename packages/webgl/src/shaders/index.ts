@@ -1,4 +1,4 @@
-import type { WGL2RC } from '../api'
+import type { ProgramInfo, WGL2RC } from '../api'
 
 export const loadShader = (
   gl: WGL2RC,
@@ -14,28 +14,26 @@ export const loadShader = (
 
 export const shaderProgram = (
   gl: WGL2RC,
-  vsSource: string,
-  fsSource: string,
-  tfVaryings: string[] | null = null,
+  { vertShader, fragShader, transformFeedbackVaryings }: ProgramInfo,
 ): WebGLProgram => {
-  const shaderProgram = gl.createProgram() as WebGLShader
-  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource)
-  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource)
+  const program = gl.createProgram() as WebGLShader
+  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertShader)
+  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragShader)
 
-  gl.attachShader(shaderProgram, vertexShader)
-  gl.attachShader(shaderProgram, fragmentShader)
+  gl.attachShader(program, vertexShader)
+  gl.attachShader(program, fragmentShader)
 
-  if (tfVaryings) {
+  if (transformFeedbackVaryings) {
     gl.transformFeedbackVaryings(
-      shaderProgram,
-      tfVaryings,
+      program,
+      transformFeedbackVaryings,
       gl.INTERLEAVED_ATTRIBS,
     )
   }
 
-  gl.linkProgram(shaderProgram)
+  gl.linkProgram(program)
 
-  return shaderProgram
+  return program
 }
 
 export * from './templates'

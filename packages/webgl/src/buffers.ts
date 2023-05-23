@@ -41,7 +41,6 @@ export const attributeFound = (bufferInfo: BufferInfo) => {
 export const setupVertexAttrib = (
   gl: WebGL2RenderingContext,
   bufferInfo: BufferInfo,
-  offset: number,
 ) => {
   gl.enableVertexAttribArray(bufferInfo.location)
   gl.vertexAttribPointer(
@@ -50,7 +49,7 @@ export const setupVertexAttrib = (
     bufferInfo.type,
     false, // normalize
     bufferInfo.stride,
-    offset,
+    bufferInfo.offset,
   )
 }
 
@@ -63,13 +62,11 @@ export const createVAO = (
 
   for (const bufferInfo of Object.values(primitive.attributes)) {
     if (!attributeFound(bufferInfo)) continue
-    let offset = 0
     bindBufferData(gl, bufferInfo)
-    setupVertexAttrib(gl, bufferInfo, offset)
-    offset += bufferInfo.numComponents * bufferInfo.size
+    setupVertexAttrib(gl, bufferInfo)
   }
 
-  bindBufferData(gl, primitive.indices)
+  if (primitive?.indices) bindBufferData(gl, primitive.indices)
 
   unbindAll(gl)
   return vao
@@ -92,14 +89,16 @@ export const createBufferInfo = (
 ): BufferInfo => ({
   data: bufferInfo.data,
   target: gl.ARRAY_BUFFER,
-  usage: gl.STATIC_DRAW,
+  usage: bufferInfo?.usage ?? gl.STATIC_DRAW,
   numComponents: bufferInfo.numComponents,
-  buffer: gl.createBuffer() as WebGLBuffer,
+  buffer: bufferInfo?.buffer ?? (gl.createBuffer() as WebGLBuffer),
   type: gl.FLOAT,
   size: bufferInfo.size,
-  stride: 0,
+  stride: bufferInfo.stride ?? 0,
+  offset: bufferInfo.offset ?? 0,
   name: bufferInfo.name,
   location: gl.getAttribLocation(program, bufferInfo.name),
+  debug: bufferInfo?.debug ?? '',
 })
 
 export const createBufferInfoForProgram = (
