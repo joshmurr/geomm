@@ -36,41 +36,53 @@ export interface IndicesBuffer {
 
 export interface BufferInfo {
   data: TypedArray
-  debug?: string
+  /* debug?: string */
   buffer: WebGLBuffer
   target: GLenum
   usage: GLenum
+  /* numComponents: number */
+  /* size: number */
+  /* name: string */
+  type: GLenum
+  attributes: AttributeBuffer[]
+  /* location: GLenum */
+  /* stride: number */
+  /* offset: number */
+}
+
+export interface AttributeInfo {
+  name: string
   numComponents: number
   size: number
-  name: string
-  type: GLenum
-  location: GLenum
+  stride?: number
+  offset?: number
+  type?: GLenum
+}
+
+export interface AttributeBuffer extends AttributeInfo {
+  location: number
   stride: number
   offset: number
+  type: GLenum
 }
 
 export type Attributes = { [key: string]: BufferInfo }
 
 /* FIXME: wtf are Primitives? This naming convention is terrible */
 export interface PrimitiveRaw {
-  name: string
   data: TypedArray
-  numComponents: number
-  size: number
-  buffer?: WebGLBuffer
-  stride?: number
   usage?: GLenum
-  offset?: number
-  debug?: string
+  buffer?: WebGLBuffer
+  attributes: AttributeInfo[]
 }
 
 export interface PrimitiveData {
-  attributes: PrimitiveRaw[]
+  buffers: PrimitiveRaw[]
   indices: TypedArray /* TODO: This is optional */
 }
 
 export interface PrimitiveBuffer {
-  attributes: BufferInfo[]
+  bufferInfo: BufferInfo[]
   indices?: IndicesBuffer
 }
 

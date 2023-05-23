@@ -1,5 +1,6 @@
 import type { TypedArray } from '@geomm/api'
 import type {
+  AttributeBuffer,
   BufferInfo,
   IndicesBuffer,
   PrimitiveBuffer,
@@ -32,24 +33,24 @@ export const unbindAll = (gl: WebGL2RenderingContext): void => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 }
 
-export const attributeFound = (bufferInfo: BufferInfo) => {
-  const found = bufferInfo.location >= 0
-  if (!found) console.warn(`Cannot find ${bufferInfo.name} in program.`)
+export const attributeFound = (attribBuf: AttributeBuffer) => {
+  const found = attribBuf.location >= 0
+  if (!found) console.warn(`Cannot find ${attribBuf.name} in program.`)
   return found
 }
 
 export const setupVertexAttrib = (
   gl: WebGL2RenderingContext,
-  bufferInfo: BufferInfo,
+  attrib: AttributeBuffer,
 ) => {
-  gl.enableVertexAttribArray(bufferInfo.location)
+  gl.enableVertexAttribArray(attrib.location)
   gl.vertexAttribPointer(
-    bufferInfo.location,
-    bufferInfo.numComponents,
-    bufferInfo.type,
+    attrib.location,
+    attrib.numComponents,
+    attrib.type,
     false, // normalize
-    bufferInfo.stride,
-    bufferInfo.offset,
+    attrib.stride,
+    attrib.offset,
   )
 }
 
@@ -60,10 +61,12 @@ export const createVAO = (
   const vao = gl.createVertexArray() as WebGLVertexArrayObject
   gl.bindVertexArray(vao)
 
-  for (const bufferInfo of Object.values(primitive.attributes)) {
-    if (!attributeFound(bufferInfo)) continue
+  for (const bufferInfo of primitive.bufferInfo) {
     bindBufferData(gl, bufferInfo)
-    setupVertexAttrib(gl, bufferInfo)
+    for (const attribInfo of bufferInfo.attributes) {
+      if (!attributeFound(attribInfo)) continue
+      setupVertexAttrib(gl, attribInfo)
+    }
   }
 
   if (primitive?.indices) bindBufferData(gl, primitive.indices)
@@ -90,15 +93,15 @@ export const createBufferInfo = (
   data: bufferInfo.data,
   target: gl.ARRAY_BUFFER,
   usage: bufferInfo?.usage ?? gl.STATIC_DRAW,
-  numComponents: bufferInfo.numComponents,
   buffer: bufferInfo?.buffer ?? (gl.createBuffer() as WebGLBuffer),
   type: gl.FLOAT,
-  size: bufferInfo.size,
-  stride: bufferInfo.stride ?? 0,
-  offset: bufferInfo.offset ?? 0,
-  name: bufferInfo.name,
-  location: gl.getAttribLocation(program, bufferInfo.name),
-  debug: bufferInfo?.debug ?? '',
+  attributes: bufferInfo.attributes.map((attributeInfo) => ({
+    ...attributeInfo,
+    type: attributeInfo.type ?? gl.FLOAT,
+    stride: attributeInfo.stride ?? 0,
+    offset: attributeInfo.offset ?? 0,
+    location: gl.getAttribLocation(program, attributeInfo.name),
+  })),
 })
 
 export const createBufferInfoForProgram = (
@@ -106,13 +109,13 @@ export const createBufferInfoForProgram = (
   primitive: PrimitiveData,
   program: WebGLProgram,
 ): PrimitiveBuffer => {
-  const attributes = primitive.attributes.map((bufferInfo) =>
-    createBufferInfo(gl, bufferInfo, program),
+  const bufferInfo = primitive.buffers.map((bufInfo) =>
+    createBufferInfo(gl, bufInfo, program),
   )
   const indices = createIndicesInfo(gl, primitive.indices)
 
   return {
-    attributes,
+    bufferInfo,
     indices,
   }
 }

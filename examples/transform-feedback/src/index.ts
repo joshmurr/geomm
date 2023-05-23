@@ -75,51 +75,58 @@ function initialParticleData(num_parts: number) {
 const NUM_PARTICLES = 1000
 const data = initialParticleData(NUM_PARTICLES)
 
-const updateBuffer = gl.createBuffer() as WebGLBuffer
-const renderBuffer = gl.createBuffer() as WebGLBuffer
-
-const buffers = [updateBuffer, renderBuffer]
+/**/
+const buffers = [
+  gl.createBuffer() as WebGLBuffer,
+  gl.createBuffer() as WebGLBuffer,
+]
 
 const typeSize = 4
-const updateBuffers = buffers.map((buf, i) =>
+const updateBuffers = buffers.map((buf) =>
   createBufferInfo(
     gl,
     {
-      name: transformFeedbackAttribs[i],
-      debug: `${i}`,
       data,
-      numComponents: 2,
-      size: 4,
-      stride: 4 * 4, // 4 * gl.FLOAT
       buffer: buf,
       usage: gl.STREAM_DRAW,
-      offset: i * 2 /*numComponents*/ * typeSize,
+      attributes: transformFeedbackAttribs.map((name, j) => ({
+        name,
+        numComponents: 2,
+        size: 4,
+        stride: 4 * 4,
+        offset: j * 2 * typeSize,
+      })),
     },
     update,
   ),
 )
 
-const renderBuffers = (buf: WebGLBuffer) =>
+const renderBuffers = buffers.map((buf) =>
   createBufferInfo(
     gl,
     {
-      name: 'a_position',
       data,
-      numComponents: 2,
-      size: 4,
-      stride: 4 * 4,
       buffer: buf,
       usage: gl.STREAM_DRAW,
-      offset: 0,
+      attributes: [
+        {
+          name: 'a_position',
+          numComponents: 2,
+          size: 4,
+          stride: 4 * 4,
+          offset: 0,
+        },
+      ],
     },
     render,
-  )
+  ),
+)
 
-const updateVAOs = Array.from({ length: 2 }, () =>
-  createVAO(gl, { attributes: updateBuffers }),
+const updateVAOs = Array.from({ length: 2 }, (_, i) =>
+  createVAO(gl, { bufferInfo: [updateBuffers[i]] }),
 )
 const renderVAOs = Array.from({ length: 2 }, (_, i) =>
-  createVAO(gl, { attributes: [renderBuffers(buffers[i])] }),
+  createVAO(gl, { bufferInfo: [renderBuffers[i]] }),
 )
 
 const state = [
@@ -159,7 +166,6 @@ function step() {
      drawing the data from the "read" buffer, not the "write" buffer
      that we've written the updated data to. */
 
-  /* ++count */
   gl.bindVertexArray(state[++count % 2].render)
   gl.useProgram(render)
   gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES)
@@ -169,6 +175,5 @@ function step() {
 }
 
 step()
-window.addEventListener('click', () => step())
 
 console.log('glError:', gl.getError())
