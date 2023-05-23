@@ -1,0 +1,25 @@
+{
+	"name": "@example/transform-feedback",
+	"version": "0.0.1",
+	"private": true,
+	"description": "TODO",
+	"repository": "https://github.com/joshmurr/geomm",
+	"author": "Josh Murr",
+	"scripts": {
+		"start": "vite --open",
+		"build": "tsc && vite build --base='./'",
+		"preview": "vite preview --host --open"
+	},
+	"devDependencies": {
+		"typescript": "^4.9.4",
+		"vite": "^3.2.0"
+	},
+	"dependencies": {
+		"@geomm/api": "^1.0.0",
+		"@geomm/dom": "^1.0.2",
+		"@geomm/webgl": "^1.0.6"
+	},
+	"browser": {
+		"process": false
+	}
+}
