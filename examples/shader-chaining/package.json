@@ -16,7 +16,8 @@
 	},
 	"dependencies": {
 		"@geomm/api": "^1.0.0",
-		"@geomm/dom": "^1.0.2"
+		"@geomm/dom": "^1.0.2",
+		"@geomm/geometry": "^1.0.2"
 	},
 	"browser": {
 		"process": false

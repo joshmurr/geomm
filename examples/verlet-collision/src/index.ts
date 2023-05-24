@@ -1,6 +1,6 @@
 import { appendEl, createEl } from '@geomm/dom'
 import { add, mag, scale, sub, vec, Vec } from '@geomm/geometry'
-import { min, randRange, sqrt } from '@geomm/maths'
+import { cos, min, randRange, sin, sqrt } from '@geomm/maths'
 
 type Particle = {
   pos: Vec
@@ -32,12 +32,16 @@ const grayscaleColors = Array.from({ length: 256 }).map((_, i) => {
 })
 
 const particles = Array.from({ length: settings.N_PARTICLES }).map((_, i) => {
-  const initialPos = vec(randRange(0, SIZE.x), randRange(0, SIZE.y))
+  const angle = randRange(0, Math.PI * 2)
+  const initialPos = vec(
+    SIZE.x / 2 + cos(angle) * 100,
+    SIZE.y / 2 + sin(angle) * 100,
+  )
   return {
     pos: initialPos,
     prevPos: initialPos,
     acc: vec(0, 0),
-    mass: 12,
+    mass: 8,
     col: grayscaleColors[i % grayscaleColors.length],
   }
 })
@@ -154,14 +158,14 @@ const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
   })
 }
 
-const steps = 6
+const steps = 8
 const dt = 1
 
 const step = (particles: Particle[], ctx: CanvasRenderingContext2D) => {
   for (let sub = 0; sub < steps; sub++) {
     particles.forEach((p) => applyForce(p, GRAVITY))
     particles.forEach((p, i) => checkCollisions(p, i, particles))
-    particles.forEach((p) => bound(p))
+    particles.forEach((p) => circularBound(p))
     particles.forEach((p) => updateParticle(p, dt / steps))
   }
 

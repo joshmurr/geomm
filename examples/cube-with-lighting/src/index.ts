@@ -1,11 +1,4 @@
-import {
-  createVAO,
-  cubeBuffer,
-  getUniformSetters,
-  setUniforms,
-  shaderProgram,
-  webgl2Canvas,
-} from '@geomm/webgl'
+import { initProgram, setUniforms, webgl2Canvas } from '@geomm/webgl'
 import {
   cos,
   identityMat,
@@ -15,10 +8,10 @@ import {
   sin,
   viewMat,
 } from '@geomm/maths'
-import { nIndices } from '@geomm/geometry'
+import { cube } from '@geomm/geometry'
 import { appendEl } from '@geomm/dom'
 
-const vert = `#version 300 es
+const vertShader = `#version 300 es
 precision mediump float;
 
 in vec3 i_Position;
@@ -49,7 +42,7 @@ void main(){
   v_Normal = transformedNormal;
 }`
 
-const frag = `#version 300 es
+const fragShader = `#version 300 es
 precision mediump float;
 
 in vec2 v_TexCoord;
@@ -65,22 +58,21 @@ void main(){
 const [c, gl] = webgl2Canvas(512, 512)
 appendEl(c)
 
-const program = shaderProgram(gl, vert, frag)
-
-const cubeBuf = cubeBuffer(gl, program)
-const cubeVAO = createVAO(gl, cubeBuf)
-
 const uniforms = {
   u_ModelMatrix: identityMat(),
   u_ViewMatrix: viewMat(),
   u_ProjectionMatrix: projectionMat(),
 }
 
-const uniformSetters = getUniformSetters(gl, program)
+const { program, vao, setters } = initProgram(gl, {
+  vertShader,
+  fragShader,
+  bufferGroup: cube,
+})
 
-gl.bindVertexArray(cubeVAO)
+gl.bindVertexArray(vao)
 gl.useProgram(program)
-setUniforms(uniformSetters, uniforms)
+setUniforms(setters, uniforms)
 
 const draw = (time: number) => {
   gl.clearColor(0.2, 0.2, 0.4, 1)
@@ -101,14 +93,14 @@ const draw = (time: number) => {
     scale: [1, 1, 1],
   })
 
-  setUniforms(uniformSetters, {
+  setUniforms(setters, {
     ...uniforms,
     u_ModelMatrix: modelViewMat,
     u_NormalMatrix: normalMatFromModel(modelViewMat),
   })
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-  gl.drawElements(gl.TRIANGLES, nIndices(cubeBuf), gl.UNSIGNED_SHORT, 0)
+  gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0)
   requestAnimationFrame(draw)
 }
 

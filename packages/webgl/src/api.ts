@@ -50,7 +50,6 @@ export interface BufferInfo {
   usage?: GLenum
   type?: GLenum
   attributes: AttributeInfo[]
-  indices?: TypedArray
 }
 
 export interface BufferData {
@@ -66,30 +65,8 @@ export interface BufferInfoComputed extends BufferData {
   indices?: TypedArray
 }
 
-/* export interface IndicesBuffer {
-  data: TypedArray
-  buffer: WebGLBuffer
-  target: GLenum
-  usage: GLenum
-} */
-
-export type Attributes = { [key: string]: BufferInfo }
-
-/* FIXME: wtf are Primitives? This naming convention is terrible */
-export interface PrimitiveRaw {
-  data: TypedArray
-  usage?: GLenum
-  buffer?: WebGLBuffer
-  attributes: AttributeInfo[]
-}
-
-export interface PrimitiveData {
-  buffers: PrimitiveRaw[]
-  indices: TypedArray /* TODO: This is optional */
-}
-
-export interface MeshBufferComputed {
-  bufferInfo: BufferInfo[]
+export interface MeshBufferGroup {
+  buffers: BufferInfo[]
   indices?: TypedArray
 }
 
@@ -111,10 +88,7 @@ export interface ProgramInfo {
 }
 
 export interface VAOProgramInfo extends ProgramInfo {
-  bufferFn: (
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram,
-  ) => PrimitiveBuffer
+  bufferGroup: MeshBufferGroup
 }
 
 export interface TextureOpts {

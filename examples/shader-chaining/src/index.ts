@@ -1,10 +1,10 @@
 import { appendEl } from '@geomm/dom'
+import { quad } from '@geomm/geometry'
 import {
   basicVert,
   createFramebuffer,
   createTexture,
   initProgram,
-  quadBuffer,
   simpleRender,
   webgl2Canvas,
 } from '@geomm/webgl'
@@ -48,7 +48,7 @@ const {
 } = initProgram(gl, {
   vertShader: basicVert,
   fragShader: programFrag,
-  bufferFn: quadBuffer,
+  bufferGroup: quad,
 })
 
 const {
@@ -58,7 +58,7 @@ const {
 } = initProgram(gl, {
   vertShader: basicVert,
   fragShader: outputFrag,
-  bufferFn: quadBuffer,
+  bufferGroup: quad,
 })
 
 const renderTex = createTexture(gl, {

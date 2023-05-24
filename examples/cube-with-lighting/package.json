@@ -17,7 +17,7 @@
   "dependencies": {
     "@geomm/api": "^1.0.0",
     "@geomm/dom": "^1.0.0",
-    "@geomm/geometry": "^1.0.0",
+    "@geomm/geometry": "^1.0.2",
     "@geomm/maths": "^1.0.0",
     "@geomm/webgl": "^1.0.0"
   },

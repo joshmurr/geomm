@@ -1,5 +1,5 @@
 import type { Program, VAOProgramInfo, WGL2RC } from './api'
-import { createVAO } from './buffers'
+import { createBufferInfo, createVAO } from './buffers'
 import { shaderProgram } from './shaders'
 import { getUniformSetters, setUniforms } from './uniforms'
 
@@ -38,11 +38,12 @@ export const simpleRender = (
 
 export const initProgram = (
   gl: WGL2RC,
-  { vertShader, fragShader, bufferFn }: VAOProgramInfo,
+  { vertShader, fragShader, bufferGroup }: VAOProgramInfo,
 ) => {
   const program = shaderProgram(gl, { vertShader, fragShader })
-  const buffer = bufferFn(gl, program)
-  const vao = createVAO(gl, buffer)
+  const { buffers, indices } = bufferGroup
+  const bufferInfos = buffers.map((buf) => createBufferInfo(gl, buf, program))
+  const vao = createVAO(gl, bufferInfos, indices)
   const uniformSetters = getUniformSetters(gl, program)
 
   return { program, vao, setters: uniformSetters }

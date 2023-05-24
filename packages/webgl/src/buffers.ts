@@ -1,3 +1,4 @@
+import type { TypedArray } from '@geomm/api'
 import type {
   AttributeInfoComputed,
   BufferData,
@@ -54,6 +55,7 @@ export const setupVertexAttrib = (
 export const createVAO = (
   gl: WebGL2RenderingContext,
   buffers: BufferInfoComputed[],
+  indices?: TypedArray,
 ): WebGLVertexArrayObject => {
   const vao = gl.createVertexArray() as WebGLVertexArrayObject
   gl.bindVertexArray(vao)
@@ -65,14 +67,14 @@ export const createVAO = (
       if (!attributeFound(attribInfo)) continue
       setupVertexAttrib(gl, attribInfo)
     }
-
-    if (bufferInfo?.indices)
-      bindBufferData(gl, {
-        data: bufferInfo.indices,
-        target: gl.ELEMENT_ARRAY_BUFFER,
-        usage: gl.STATIC_DRAW,
-        buffer: gl.createBuffer() as WebGLBuffer,
-      })
+  }
+  if (indices) {
+    bindBufferData(gl, {
+      data: indices,
+      target: gl.ELEMENT_ARRAY_BUFFER,
+      usage: gl.STATIC_DRAW,
+      buffer: gl.createBuffer() as WebGLBuffer,
+    })
   }
 
   unbindAll(gl)
@@ -97,20 +99,4 @@ export const createBufferInfo = (
     offset: attributeInfo.offset ?? 0,
     location: gl.getAttribLocation(program, attributeInfo.name),
   })),
-
-  indices: bufferInfo?.indices ?? undefined,
 })
-
-/* export const createBufferInfoForMesh = (
-  gl: WGL2RC,
-  primitive: { buffers: BufferInfo[] },
-  program: WebGLProgram,
-): MeshBufferComputed => {
-  const bufferInfo = primitive.buffers.map((bufInfo) =>
-    createBufferInfo(gl, bufInfo, program),
-  )
-
-  return {
-    bufferInfo,
-  }
-} */
