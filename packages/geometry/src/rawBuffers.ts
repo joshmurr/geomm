@@ -22,7 +22,7 @@ export const quad = {
     },
     {
       data: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
-      atributes: [
+      attributes: [
         {
           name: 'i_TexCoord',
           numComponents: 2,
@@ -35,57 +35,55 @@ export const quad = {
 }
 
 export const cube = {
-  attributes: [
+  buffers: [
     {
-      name: 'i_Position',
       data: new Float32Array([
         // Front face
         -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1,
-
         // Back face
         -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1,
-
         // Top face
         -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1,
-
         // Bottom face
         -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1,
-
         // Right face
         1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1,
-
         // Left face
         -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, 1, -1,
       ]),
-      numComponents: 3,
-      size: 4,
+      attributes: [
+        {
+          name: 'i_Position',
+          numComponents: 3,
+          size: 4,
+        },
+      ],
     },
     {
-      name: 'i_Normal',
       data: new Float32Array([
         // Front
         0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-
         // Back
         0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-
         // Top
         0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-
         // Bottom
         0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-
         // Right
         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-
         // Left
         -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
       ]),
-      numComponents: 3,
-      size: 4,
+      attributes: [
+        {
+          name: 'i_Normal',
+          numComponents: 3,
+          size: 4,
+        },
+      ],
     },
+
     {
-      name: 'i_TexCoord',
       data: new Float32Array([
         // Front
         0, 0, 1, 0, 1, 1, 0, 1,
@@ -100,11 +98,17 @@ export const cube = {
         // Left
         0, 0, 1, 0, 1, 1, 0, 1,
       ]),
-      numComponents: 2,
-      size: 4,
+
+      attributes: [
+        {
+          name: 'i_TexCoord',
+          numComponents: 2,
+          size: 4,
+        },
+      ],
     },
+
     {
-      name: 'i_Color',
       data: new Float32Array([
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
@@ -118,8 +122,14 @@ export const cube = {
 
         1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1,
       ]),
-      numComponents: 4,
-      size: 4,
+
+      attributes: [
+        {
+          name: 'i_Color',
+          numComponents: 4,
+          size: 4,
+        },
+      ],
     },
   ],
   indices: new Uint16Array([
@@ -163,20 +173,23 @@ export const cube = {
 }
 
 export const icosahedron = {
-  attributes: [
+  buffers: [
     {
-      name: 'i_Position',
       data: new Float32Array([
         0.0, 0.0, 1.0, 0.894, 0.0, 0.447, 0.276, 0.851, 0.447, -0.724, 0.526,
         0.447, -0.724, -0.526, 0.447, 0.276, -0.851, 0.447, 0.724, 0.526,
         -0.447, -0.276, 0.851, -0.447, -0.894, 0.0, -0.447, -0.276, -0.851,
         -0.447, 0.724, -0.526, -0.447, 0.0, 0.0, -1.0,
       ]),
-      numComponents: 3,
-      size: 4,
+      attributes: [
+        {
+          name: 'i_Position',
+          numComponents: 3,
+          size: 4,
+        },
+      ],
     },
     {
-      name: 'i_Normal',
       data: new Float32Array([
         0, 0, 1, 0.8944271909999159, 0, 0.4472135954999579, 0.2759743355801311,
         0.8509208680387375, 0.44695843479825575, -0.7237608365587472,
@@ -189,8 +202,13 @@ export const icosahedron = {
         -0.44695843479825575, 0.7237608365587472, -0.5258262431352224,
         -0.4468523396985635, 0, 0, -1,
       ]),
-      numComponents: 3,
-      size: 4,
+      attributes: [
+        {
+          name: 'i_Normal',
+          numComponents: 3,
+          size: 4,
+        },
+      ],
     },
   ],
   indices: new Uint16Array([

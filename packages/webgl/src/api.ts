@@ -27,29 +27,6 @@ export interface Setter {
 
 export type Setters = StringMap<(val: unknown) => void>
 
-export interface IndicesBuffer {
-  data: TypedArray
-  buffer: WebGLBuffer
-  target: GLenum
-  usage: GLenum
-}
-
-export interface BufferInfo {
-  data: TypedArray
-  /* debug?: string */
-  buffer: WebGLBuffer
-  target: GLenum
-  usage: GLenum
-  /* numComponents: number */
-  /* size: number */
-  /* name: string */
-  type: GLenum
-  attributes: AttributeBuffer[]
-  /* location: GLenum */
-  /* stride: number */
-  /* offset: number */
-}
-
 export interface AttributeInfo {
   name: string
   numComponents: number
@@ -59,12 +36,42 @@ export interface AttributeInfo {
   type?: GLenum
 }
 
-export interface AttributeBuffer extends AttributeInfo {
+export interface AttributeInfoComputed extends AttributeInfo {
   location: number
   stride: number
   offset: number
   type: GLenum
 }
+
+export interface BufferInfo {
+  data?: TypedArray | null
+  buffer?: WebGLBuffer
+  target?: GLenum
+  usage?: GLenum
+  type?: GLenum
+  attributes: AttributeInfo[]
+  indices?: TypedArray
+}
+
+export interface BufferData {
+  buffer: WebGLBuffer
+  target: GLenum
+  usage: GLenum
+  data: TypedArray | null
+}
+
+export interface BufferInfoComputed extends BufferData {
+  type: GLenum
+  attributes: AttributeInfoComputed[]
+  indices?: TypedArray
+}
+
+/* export interface IndicesBuffer {
+  data: TypedArray
+  buffer: WebGLBuffer
+  target: GLenum
+  usage: GLenum
+} */
 
 export type Attributes = { [key: string]: BufferInfo }
 
@@ -81,9 +88,9 @@ export interface PrimitiveData {
   indices: TypedArray /* TODO: This is optional */
 }
 
-export interface PrimitiveBuffer {
+export interface MeshBufferComputed {
   bufferInfo: BufferInfo[]
-  indices?: IndicesBuffer
+  indices?: TypedArray
 }
 
 /* TODO: Progam props, what is required here? What can be inferred? */

@@ -81,7 +81,6 @@ const buffers = [
   gl.createBuffer() as WebGLBuffer,
 ]
 
-const typeSize = 4
 const updateBuffers = buffers.map((buf) =>
   createBufferInfo(
     gl,
@@ -89,13 +88,20 @@ const updateBuffers = buffers.map((buf) =>
       data,
       buffer: buf,
       usage: gl.STREAM_DRAW,
-      attributes: transformFeedbackAttribs.map((name, j) => ({
-        name,
-        numComponents: 2,
-        size: 4,
-        stride: 4 * 4,
-        offset: j * 2 * typeSize,
-      })),
+      attributes: transformFeedbackAttribs.map((name, j) => {
+        const numComponents = 2
+        const size = 4
+        const stride = size * 4
+        const offset = j * numComponents * size
+
+        return {
+          name,
+          numComponents,
+          size,
+          stride,
+          offset,
+        }
+      }),
     },
     update,
   ),
