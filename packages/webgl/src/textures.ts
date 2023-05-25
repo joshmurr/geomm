@@ -80,8 +80,6 @@ export const updateTexture = (gl: WGL2RC, opts: TextureOptsOut) => {
     data,
   )
 
-  console.log(width, height)
-
   if (typeof data === 'string') {
     const image = new Image()
     image.onload = () => {

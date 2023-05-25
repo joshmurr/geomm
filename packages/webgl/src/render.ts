@@ -1,14 +1,21 @@
-import type { Program, VAOProgramInfo, WGL2RC } from './api'
-import { createBufferInfo, createVAO } from './buffers'
-import { shaderProgram } from './shaders'
-import { getUniformSetters, setUniforms } from './uniforms'
+import type { Program, Viewport, WGL2RC } from './api'
+import { setUniforms } from './uniforms'
+
+const setViewport = (gl: WGL2RC, viewport: Viewport) => {
+  if (Array.isArray(viewport)) {
+    if (viewport.length === 2) return gl.viewport(0, 0, ...viewport)
+    return gl.viewport(...viewport)
+  }
+  if (viewport) return gl.viewport(0, 0, viewport.x, viewport.y)
+  return gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+}
 
 export const simpleRender = (
   gl: WGL2RC,
   loop: boolean,
   programs: Program[],
 ) => {
-  programs.forEach(({ vao, program, fbo, uniforms, setters, resolution }) => {
+  programs.forEach(({ vao, program, fbo, uniforms, setters, viewport }) => {
     const draw = (time: number) => {
       gl.useProgram(program)
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbo || null)
@@ -17,12 +24,7 @@ export const simpleRender = (
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
       gl.clearColor(0.9, 0.9, 0.9, 1)
 
-      gl.viewport(
-        0,
-        0,
-        resolution?.x || gl.canvas.width,
-        resolution?.y || gl.canvas.height,
-      )
+      setViewport(gl, viewport)
 
       setUniforms(setters, {
         u_Time: time,
@@ -34,19 +36,6 @@ export const simpleRender = (
     }
     requestAnimationFrame(draw)
   })
-}
-
-export const initProgram = (
-  gl: WGL2RC,
-  { vertShader, fragShader, bufferGroup }: VAOProgramInfo,
-) => {
-  const program = shaderProgram(gl, { vertShader, fragShader })
-  const { buffers, indices } = bufferGroup
-  const bufferInfos = buffers.map((buf) => createBufferInfo(gl, buf, program))
-  const vao = createVAO(gl, bufferInfos, indices)
-  const uniformSetters = getUniformSetters(gl, program)
-
-  return { program, vao, setters: uniformSetters }
 }
 
 export const pingPong = (
@@ -64,7 +53,7 @@ export const pingPong = (
         gl.useProgram(program)
         setUniforms(setters, uniforms)
 
-        gl.viewport(0, 0, viewport[0], viewport[1])
+        setViewport(gl, viewport)
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0)
       },
     )
@@ -73,7 +62,7 @@ export const pingPong = (
     gl.bindVertexArray(renderProgram.vao)
     gl.useProgram(renderProgram.program)
     setUniforms(renderProgram.setters, renderProgram.uniforms)
-    gl.viewport(0, 0, renderProgram.viewport[0], renderProgram.viewport[1])
+    setViewport(gl, renderProgram.viewport)
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0)
 
     if (loop) {

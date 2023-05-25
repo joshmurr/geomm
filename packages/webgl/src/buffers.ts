@@ -100,3 +100,9 @@ export const createBufferInfo = (
     location: gl.getAttribLocation(program, attributeInfo.name),
   })),
 })
+
+export const createBufferInfos = (
+  gl: WGL2RC,
+  bufferInfos: BufferInfo[],
+  program: WebGLProgram,
+) => bufferInfos.map((bufferInfo) => createBufferInfo(gl, bufferInfo, program))

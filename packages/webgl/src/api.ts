@@ -1,4 +1,5 @@
 import type { StringMap, TypedArray } from '@geomm/api'
+import type { Vec } from '@geomm/geometry'
 
 export type WGL2RC = WebGL2RenderingContext
 
@@ -70,15 +71,22 @@ export interface MeshBufferGroup {
   indices?: TypedArray
 }
 
+export type Viewport =
+  | [number, number, number, number]
+  | [number, number]
+  | Vec
+  | null
+  | undefined
+
 /* TODO: Progam props, what is required here? What can be inferred? */
 export interface Program {
   vao: WebGLVertexArrayObject
   program: WebGLProgram
   uniforms: StringMap<unknown>
   setters: Setters
-  viewport: number[]
+  viewport?: Viewport
   fbo?: WebGLFramebuffer | null
-  resolution?: { x: number; y: number } | null
+  /* resolution?: { x: number; y: number } | null */
 }
 
 export interface ProgramInfo {
