@@ -1,14 +1,11 @@
 import {
   createTexture,
-  createVAO,
-  getUniformSetters,
-  quadBuffer,
+  initProgram,
   setUniforms,
-  shaderProgram,
   updateTexture,
   webgl2Canvas,
 } from '@geomm/webgl'
-import { add } from '@geomm/dom'
+import { appendEl } from '@geomm/dom'
 import {
   identityMat,
   matFromTransformations,
@@ -17,8 +14,9 @@ import {
   sin,
   floor,
 } from '@geomm/maths'
+import { quad } from '@geomm/geometry'
 
-const vert = `#version 300 es
+const vertShader = `#version 300 es
 precision mediump float;
 
 in vec3 i_Position;
@@ -35,7 +33,7 @@ void main(){
   v_TexCoord = i_TexCoord;
 }`
 
-const frag = `#version 300 es
+const fragShader = `#version 300 es
 precision mediump float;
 
 in vec2 v_TexCoord;
@@ -50,28 +48,31 @@ void main(){
 }`
 
 const [c, gl] = webgl2Canvas(512, 512)
-add(c)
+appendEl(c)
 
-const program = shaderProgram(gl, vert, frag)
-
-const quadBuf = quadBuffer(gl, program)
-const quadVAO = createVAO(gl, quadBuf)
+const { setters } = initProgram(gl, {
+  vertShader,
+  fragShader,
+  bufferGroup: quad,
+})
 
 gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
 const redTex = createTexture(gl, {
   name: 'u_Texture',
   width: 1,
   height: 1,
-  type: 'RGB8',
+  internalFormat: 'RGB8',
   format: 'RGB',
+  type: 'UNSIGNED_BYTE',
   data: new Uint8ClampedArray([0, 0, 255]),
 })
 const blueTex = createTexture(gl, {
   name: 'u_SecondTexture',
   width: 1,
   height: 1,
-  type: 'RGB8',
   format: 'RGB',
+  internalFormat: 'RGB8',
+  type: 'UNSIGNED_BYTE',
   data: new Uint8ClampedArray([255, 0, 0]),
 })
 
@@ -83,11 +84,7 @@ const uniforms = {
   u_SecondTexture: redTex,
 }
 
-const uniformSetters = getUniformSetters(gl, program)
-
-gl.bindVertexArray(quadVAO)
-gl.useProgram(program)
-setUniforms(uniformSetters, uniforms)
+setUniforms(setters, uniforms)
 
 const draw = (time: number) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -98,7 +95,7 @@ const draw = (time: number) => {
 
   const redData = new Uint8Array([r, 0, 0])
   const blueData = new Uint8Array([0, 0, r])
-  setUniforms(uniformSetters, {
+  setUniforms(setters, {
     ...uniforms,
     u_ModelMatrix: matFromTransformations({
       translation: [0.2, 0.2, -3],

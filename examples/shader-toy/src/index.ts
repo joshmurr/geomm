@@ -1,15 +1,13 @@
 import {
-  createVAO,
-  getUniformSetters,
-  quadBuffer,
   simpleRender,
   setUniforms,
-  shaderProgram,
   webgl2Canvas,
+  initProgram,
 } from '@geomm/webgl'
-import { add } from '@geomm/dom'
+import { appendEl } from '@geomm/dom'
+import { quad } from '@geomm/geometry'
 
-const vert = `#version 300 es
+const vertShader = `#version 300 es
 precision mediump float;
 
 in vec3 i_Position;
@@ -18,7 +16,7 @@ void main(){
   gl_Position = vec4(i_Position, 1.0);
 }`
 
-const frag = `#version 300 es
+const fragShader = `#version 300 es
 precision mediump float;
 
 uniform vec2 u_Resolution;
@@ -33,28 +31,23 @@ void main(){
 }`
 
 const [c, gl] = webgl2Canvas(512, 512)
-add(c)
+appendEl(c)
 
-const program = shaderProgram(gl, vert, frag)
-
-const quadBuf = quadBuffer(gl, program)
-const quadVAO = createVAO(gl, quadBuf)
-
+const { program, vao, setters } = initProgram(gl, {
+  vertShader,
+  fragShader,
+  bufferGroup: quad,
+})
 const uniforms = {
   u_Resolution: [c.width, c.height],
 }
-
-const uniformSetters = getUniformSetters(gl, program)
-
-gl.bindVertexArray(quadVAO)
-gl.useProgram(program)
-setUniforms(uniformSetters, uniforms)
+setUniforms(setters, uniforms)
 
 simpleRender(gl, false, [
   {
-    vao: quadVAO,
-    program: program,
+    vao: vao,
+    program,
     uniforms: uniforms,
-    setters: uniformSetters,
+    setters,
   },
 ])
