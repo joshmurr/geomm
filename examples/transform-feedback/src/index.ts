@@ -129,10 +129,10 @@ const renderBuffers = buffers.map((buf) =>
 )
 
 const updateVAOs = Array.from({ length: 2 }, (_, i) =>
-  createVAO(gl, { bufferInfo: [updateBuffers[i]] }),
+  createVAO(gl, [updateBuffers[i]]),
 )
 const renderVAOs = Array.from({ length: 2 }, (_, i) =>
-  createVAO(gl, { bufferInfo: [renderBuffers[i]] }),
+  createVAO(gl, [renderBuffers[i]]),
 )
 
 const state = [
