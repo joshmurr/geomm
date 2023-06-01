@@ -5,7 +5,6 @@ import { makeGui } from './gui'
 
 type Particle = {
   pos: Vec
-  stochasticAmplitude: number
 }
 
 type Setting =
@@ -55,7 +54,6 @@ const particles = Array.from(
   { length: settings.nParticles.max as number },
   () => ({
     pos: vec(randRange(0, 1), randRange(0, 1)),
-    stochasticAmplitude: 0,
   }),
 )
 
@@ -72,19 +70,11 @@ const move = (p: Particle) => {
   const eq = chladni(p.pos, a.val, b.val, m.val, n.val)
 
   // set the amplitude of the move -> proportional to the vibration
-  p.stochasticAmplitude = vel.val * abs(eq)
-
-  if (p.stochasticAmplitude <= minWalk.val) p.stochasticAmplitude = minWalk.val
+  const stochasticAmplitude = Math.max(vel.val * abs(eq), minWalk.val)
 
   // perform one random walk
-  p.pos.x += randRange(
-    -p.stochasticAmplitude * 0.5,
-    p.stochasticAmplitude * 0.5,
-  )
-  p.pos.y += randRange(
-    -p.stochasticAmplitude * 0.5,
-    p.stochasticAmplitude * 0.5,
-  )
+  p.pos.x += randRange(-stochasticAmplitude * 0.5, stochasticAmplitude * 0.5)
+  p.pos.y += randRange(-stochasticAmplitude * 0.5, stochasticAmplitude * 0.5)
 
   bound(p)
 }

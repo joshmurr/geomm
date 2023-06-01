@@ -75,11 +75,13 @@ function initialParticleData(num_parts: number) {
 const NUM_PARTICLES = 1000
 const data = initialParticleData(NUM_PARTICLES)
 
-/**/
 const buffers = [
   gl.createBuffer() as WebGLBuffer,
   gl.createBuffer() as WebGLBuffer,
 ]
+
+// gl.FLOAT = 32 bit = 4 byte
+const FLOAT_SIZE = 4
 
 const updateBuffers = buffers.map((buf) =>
   createBufferInfo(
@@ -90,14 +92,13 @@ const updateBuffers = buffers.map((buf) =>
       usage: gl.STREAM_DRAW,
       attributes: transformFeedbackAttribs.map((name, j) => {
         const numComponents = 2
-        const size = 4
-        const stride = size * 4
-        const offset = j * numComponents * size
+        const stride =
+          FLOAT_SIZE * (numComponents * transformFeedbackAttribs.length)
+        const offset = j * numComponents * FLOAT_SIZE
 
         return {
           name,
           numComponents,
-          size,
           stride,
           offset,
         }
@@ -118,8 +119,7 @@ const renderBuffers = buffers.map((buf) =>
         {
           name: 'a_position',
           numComponents: 2,
-          size: 4,
-          stride: 4 * 4,
+          stride: FLOAT_SIZE * (2 * transformFeedbackAttribs.length),
           offset: 0,
         },
       ],
