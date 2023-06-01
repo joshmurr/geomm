@@ -31,7 +31,6 @@ export type Setters = StringMap<(val: unknown) => void>
 export interface AttributeInfo {
   name: string
   numComponents: number
-  size: number
   stride?: number
   offset?: number
   type?: GLenum
