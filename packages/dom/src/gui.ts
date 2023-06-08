@@ -32,7 +32,7 @@ export const makeGui = (settings: Settings) => {
             value: setting.val,
             oninput: (e: MouseEvent) => {
               const val = parseFloat((e.target as HTMLInputElement).value)
-              settings[key].val = val
+              settings[key].val = val * (setting?.scale || 1)
             },
           }),
         )

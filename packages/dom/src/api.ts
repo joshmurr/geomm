@@ -4,6 +4,7 @@ export type Setting =
       val: number
       min: number
       max: number
+      scale?: number
     }
   | {
       type: 'checkbox'
