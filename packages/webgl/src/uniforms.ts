@@ -1,4 +1,5 @@
 import type { StringMap } from '@geomm/api'
+import type { Settings } from '@geomm/dom'
 import type { WGL2RC } from './api'
 import { setters } from './setters'
 
@@ -53,6 +54,16 @@ export const setUniforms = (
     if (!setters[name]) continue // Uniform was not found in shader
     setters[name](value)
   }
+}
+
+export const uniformsFromSettings = (settings: Settings) => {
+  return Object.entries(settings).reduce(
+    (uniforms, [name, setting]) => ({
+      ...uniforms,
+      [name]: setting.val,
+    }),
+    {},
+  )
 }
 
 /* export const setUBO = ( */
