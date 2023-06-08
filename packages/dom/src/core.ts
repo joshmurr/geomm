@@ -3,7 +3,11 @@ const isEventListener = (key: string) => key.startsWith('on')
 export const createEl = <T extends HTMLElement>(
   type: string,
   opts?: {
-    [key: string]: number | string | EventListenerOrEventListenerObject
+    [key: string]:
+      | number
+      | string
+      | EventListenerOrEventListenerObject
+      | ((e: MouseEvent) => void)
   },
 ): T => {
   const el = document.createElement(type) as T
