@@ -1,9 +1,85 @@
-import { appendEl, createEl } from '@geomm/dom'
-import { createBufferInfo, createVAO, shaderProgram } from '@geomm/webgl'
+import { appendEl, createEl, makeGui, Settings } from '@geomm/dom'
+import {
+  createBufferInfo,
+  createTexture,
+  createVAO,
+  getUniformSetters,
+  setUniforms,
+  shaderProgram,
+  uniformsFromSettings,
+} from '@geomm/webgl'
+import { hexToRgb, intRgbToFloat } from '@geomm/color'
+import { hexColors } from './colors'
+import seed from './images/11.png'
 
 const c = createEl('canvas', { width: 512, height: 512 }) as HTMLCanvasElement
 const gl = c.getContext('webgl2') as WebGL2RenderingContext
 appendEl(c)
+
+const settings: Settings = {
+  minWalk: {
+    type: 'range',
+    val: 0.0002,
+    min: 0,
+    max: 100,
+    scale: 0.0001,
+  },
+  A: {
+    type: 'range',
+    val: 2.9,
+    min: 0.0001,
+    max: 3.0,
+  },
+  a: {
+    type: 'range',
+    val: 2,
+    min: 0.1,
+    max: 10,
+  },
+  b: {
+    type: 'range',
+    val: 1.2,
+    min: 0.1,
+    max: 10,
+  },
+  m: {
+    type: 'range',
+    val: 8,
+    min: 0.1,
+    max: 10,
+  },
+  n: {
+    type: 'range',
+    val: 4,
+    min: 0.1,
+    max: 10,
+  },
+  vel: {
+    type: 'range',
+    val: 0.0002,
+    min: 0,
+    max: 100,
+    scale: 0.0001,
+  },
+  chladniDisplace: {
+    type: 'range',
+    val: 100,
+    min: 0,
+    max: 200,
+    scale: 0.01,
+  },
+  imgDisplace: {
+    type: 'range',
+    val: 0.0,
+    min: 0,
+    max: 1000,
+    scale: 0.001,
+  },
+}
+
+const mouse = [0, 0, 0]
+
+makeGui(settings)
 
 const update_vs = `#version 300 es
   in vec2 a_position;
@@ -12,12 +88,17 @@ const update_vs = `#version 300 es
   #define PI 3.1415926535897932384626433832795
   #define aspect 1.0
 
-  const float a = 2.0;
-  const float b = 1.2;
-  const float m = 8.0;
-  const float n = 4.0;
-  const float vel = 0.02;
-  const float minWalk = 0.001;
+  uniform float a;
+  uniform float b;
+  uniform float m;
+  uniform float n;
+  uniform float vel;
+  uniform float minWalk;
+  uniform float time;
+  uniform sampler2D seedImg;
+  uniform float chladniDisplace;
+  uniform float imgDisplace;
+  uniform vec3 mouse;
 
   float chladni(vec2 pos, float a, float b, float m, float n) {
     return a * sin(PI * n * pos.x * aspect) * sin(PI * m * pos.y) + b * sin(PI * m * pos.x * aspect) * sin(PI * n * pos.y);
@@ -29,8 +110,9 @@ const update_vs = `#version 300 es
   }
 
   float stoch(vec2 pos) {
-    float eq = chladni(pos, a, b, m, n);
-    float newStoch = max(vel * abs(eq), minWalk);
+    float eq = chladni(pos, a, b, m, n) * chladniDisplace;
+    float displace = texture(seedImg, pos * 0.5 + vec2(0.5)).r * imgDisplace;
+    float newStoch = max((vel + displace) * 0.5 * abs(eq), minWalk);
 
     return newStoch;
   }
@@ -40,8 +122,10 @@ const update_vs = `#version 300 es
   }
 
   vec2 move(vec2 pos, float stochasticAmp) {
-    float r = random(pos);
-    vec2 newPos = pos + vec2(randRange(-stochasticAmp, stochasticAmp), randRange(stochasticAmp, -stochasticAmp));
+    float _x = randRange(-stochasticAmp, stochasticAmp);
+    float _y = randRange(-stochasticAmp, stochasticAmp);
+
+    vec2 newPos = pos + vec2(_x, _y);
 
     return newPos;
   }
@@ -58,6 +142,13 @@ const update_vs = `#version 300 es
   void main(){
     float stochasticAmp = stoch(a_position);
     v_position = bound(move(a_position, stochasticAmp));
+
+    if(mouse.z > 0.5) {
+      int scale = 4;
+      float _x = float(gl_VertexID * scale % 512);
+      float _y = floor(float(gl_VertexID * scale) / 512.0);
+      v_position = vec2(_x, _y) / 512.0 * 2.0 - 1.0;
+    }
   }
 `
 const update_fs = `#version 300 es
@@ -72,16 +163,20 @@ const render_vs = `#version 300 es
   in vec2 a_position;
 
   void main(){
-    gl_PointSize = 1.0;
+    gl_PointSize = 1.5;
 		gl_Position = vec4(a_position, 0.0, 1.0);
   }
 `
 const render_fs = `#version 300 es
   precision mediump float;
+  uniform vec3 particleColor;
+  uniform sampler2D seedImg;
   out vec4 outcolor;
 
   void main(){
-    outcolor = vec4(vec3(0.0), 1.0);
+    /* vec2 uv = gl_FragCoord.xy / vec2(512.0, 512.0); */
+    /* outcolor = texture(seedImg, uv); */
+    outcolor = vec4(particleColor, 1.0);
   }
 `
 
@@ -106,7 +201,7 @@ function initialParticleData(num_parts: number) {
   return new Float32Array(data)
 }
 
-const NUM_PARTICLES = 10000
+const NUM_PARTICLES = 80000
 const data = initialParticleData(NUM_PARTICLES)
 
 /**/
@@ -167,6 +262,9 @@ const renderVAOs = Array.from({ length: 2 }, (_, i) =>
   createVAO(gl, [renderBuffers[i]]),
 )
 
+const updateUniformSetters = getUniformSetters(gl, update)
+const renderUniformSetters = getUniformSetters(gl, render)
+
 const state = [
   {
     update: updateVAOs[0],
@@ -178,12 +276,27 @@ const state = [
   },
 ]
 
+const seedImg = createTexture(gl, {
+  name: 'seedImg',
+  type: 'UNSIGNED_BYTE',
+  format: 'RGBA',
+  internalFormat: 'RGBA',
+  data: seed,
+})
+
 let count = 0
-function step() {
-  gl.clearColor(0.8, 0.8, 0.8, 1.0)
+function step(time: number) {
+  gl.clearColor(...intRgbToFloat(hexToRgb(hexColors.pink)), 1.0)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   gl.useProgram(update)
   gl.bindVertexArray(state[count % 2].update)
+  /* Set uniforms */
+  setUniforms(updateUniformSetters, {
+    ...uniformsFromSettings(settings),
+    time: time,
+    seedImg,
+    mouse,
+  })
   /* Bind the "write" buffer as transform feedback - the varyings of the
      update shader will be written here. */
   gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, buffers[++count % 2])
@@ -194,7 +307,8 @@ function step() {
 
   /* Begin transform feedback! */
   gl.beginTransformFeedback(gl.POINTS)
-  gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES) /*** !!!! ***/
+
+  gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES)
   gl.endTransformFeedback()
   gl.disable(gl.RASTERIZER_DISCARD)
   /* Don't forget to unbind the transform feedback buffer! */
@@ -206,12 +320,19 @@ function step() {
 
   gl.bindVertexArray(state[++count % 2].render)
   gl.useProgram(render)
+  setUniforms(renderUniformSetters, {
+    particleColor: intRgbToFloat(hexToRgb(hexColors.red)),
+    seedImg,
+  })
   gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES)
   count++
 
   window.requestAnimationFrame(step)
 }
 
-step()
+c.addEventListener('mousedown', () => (mouse[2] = 1))
+c.addEventListener('mouseup', () => (mouse[2] = 0))
+
+window.requestAnimationFrame(step)
 
 console.log('glError:', gl.getError())
