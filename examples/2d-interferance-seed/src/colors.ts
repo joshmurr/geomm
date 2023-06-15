@@ -16,7 +16,7 @@ export const hexToRgb = (hex: string) => {
 }
 
 export const intRgbToFloat = (rgb: { r: number; g: number; b: number }) => {
-  return Object.values(rgb).map((c) => c / 255)
+  return Object.values(rgb).map((c) => c / 255) as [number, number, number]
 }
 
 export const valToHue = (val: number, min: number, max: number) => {

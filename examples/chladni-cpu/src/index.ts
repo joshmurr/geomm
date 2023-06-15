@@ -1,24 +1,9 @@
-import { appendEl, canvas } from '@geomm/dom'
+import { appendEl, canvas, makeGui, Settings } from '@geomm/dom'
 import { type Vec, vec, toScreen } from '@geomm/geometry'
 import { abs, PI, randRange, sin } from '@geomm/maths'
-import { makeGui } from './gui'
 
 type Particle = {
   pos: Vec
-}
-
-type Setting =
-  | {
-      val: number
-      min: number
-      max: number
-    }
-  | {
-      val: boolean
-    }
-
-export type Settings = {
-  [key: string]: Setting
 }
 
 let size = [window.innerWidth, window.innerHeight] as const
@@ -26,18 +11,54 @@ let aspect = size[0] / size[1]
 
 const settings: Settings = {
   nParticles: {
+    type: 'range',
     val: 2000,
     min: 1000,
     max: 10000,
   },
-  drawHeatmap: { val: false },
-  minWalk: { val: 0.002, min: 0.0001, max: 0.01 },
-  A: { val: 0.02, min: 0.0001, max: 0.1 },
-  a: { val: 2, min: 0.1, max: 10 },
-  b: { val: 1.2, min: 0.1, max: 10 },
-  m: { val: 8, min: 0.1, max: 10 },
-  n: { val: 4, min: 0.1, max: 10 },
-  vel: { val: 0.01, min: 0.0001, max: 0.1 },
+  drawHeatmap: { type: 'checkbox', val: false },
+  minWalk: {
+    type: 'range',
+    val: 0.002,
+    min: 0.0001,
+    max: 0.01,
+  },
+  A: {
+    type: 'range',
+    val: 0.02,
+    min: 0.0001,
+    max: 0.1,
+  },
+  a: {
+    type: 'range',
+    val: 2,
+    min: 0.1,
+    max: 10,
+  },
+  b: {
+    type: 'range',
+    val: 1.2,
+    min: 0.1,
+    max: 10,
+  },
+  m: {
+    type: 'range',
+    val: 8,
+    min: 0.1,
+    max: 10,
+  },
+  n: {
+    type: 'range',
+    val: 4,
+    min: 0.1,
+    max: 10,
+  },
+  vel: {
+    type: 'range',
+    val: 0.01,
+    min: 0.0001,
+    max: 0.1,
+  },
 }
 
 makeGui(settings)
@@ -50,12 +71,9 @@ const chladni = (v: Vec, a: number, b: number, m: number, n: number) =>
 const c = canvas(...size)
 appendEl(c)
 
-const particles = Array.from(
-  { length: settings.nParticles.max as number },
-  () => ({
-    pos: vec(randRange(0, 1), randRange(0, 1)),
-  }),
-)
+const particles = Array.from({ length: settings.nParticles.max }, () => ({
+  pos: vec(randRange(0, 1), randRange(0, 1)),
+}))
 
 const bound = (p: Particle) => {
   if (p.pos.x < 0) p.pos.x = 0
