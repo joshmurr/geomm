@@ -1,4 +1,11 @@
-import { appendEl, createEl, makeGui, Settings } from '@geomm/dom'
+import {
+  appendEl,
+  createEl,
+  getEl,
+  makeGui,
+  Settings,
+  updateGuiValues,
+} from '@geomm/dom'
 import {
   createBufferInfo,
   createTexture,
@@ -7,19 +14,47 @@ import {
   setUniforms,
   shaderProgram,
   uniformsFromSettings,
+  updateTexture,
 } from '@geomm/webgl'
 import { hexToRgb, intRgbToFloat } from '@geomm/color'
+import { makeGaussian } from '@geomm/maths'
 import { hexColors } from './colors'
-import seed from './images/11.png'
+import seed from './images/14.png'
+import { render_fs, render_vs, update_fs, update_vs } from './shaders'
 
 const c = createEl('canvas', { width: 512, height: 512 }) as HTMLCanvasElement
 const gl = c.getContext('webgl2') as WebGL2RenderingContext
 appendEl(c)
 
+const seedImg = createTexture(gl, {
+  name: 'seedImg',
+  type: 'UNSIGNED_BYTE',
+  format: 'RGBA',
+  internalFormat: 'RGBA',
+  data: seed,
+})
+
+const backplateImg = createTexture(gl, {
+  name: 'backplateImg',
+  type: 'UNSIGNED_BYTE',
+  format: 'RGBA',
+  internalFormat: 'RGBA',
+  data: null,
+})
+
+const handleFileLoad = (files: FileList | null, onload: (e) => void | null) => {
+  if (files) {
+    const file = files[0]
+    const reader = new FileReader()
+    reader.onload = onload
+    reader.readAsDataURL(file)
+  }
+}
+
 const settings: Settings = {
   minWalk: {
     type: 'range',
-    val: 0.0002,
+    val: 0.00076,
     min: 0,
     max: 100,
     scale: 0.0001,
@@ -33,25 +68,25 @@ const settings: Settings = {
   a: {
     type: 'range',
     val: 2,
-    min: 0.1,
+    min: -10,
     max: 10,
   },
   b: {
     type: 'range',
-    val: 1.2,
-    min: 0.1,
+    val: 4.2,
+    min: -10,
     max: 10,
   },
   m: {
     type: 'range',
-    val: 8,
-    min: 0.1,
+    val: 6,
+    min: -10,
     max: 10,
   },
   n: {
     type: 'range',
     val: 4,
-    min: 0.1,
+    min: -10,
     max: 10,
   },
   vel: {
@@ -63,8 +98,8 @@ const settings: Settings = {
   },
   chladniDisplace: {
     type: 'range',
-    val: 100,
-    min: 0,
+    val: 0.0,
+    min: 1,
     max: 200,
     scale: 0.01,
   },
@@ -75,110 +110,57 @@ const settings: Settings = {
     max: 1000,
     scale: 0.001,
   },
+  displacementImg: {
+    type: 'file',
+    callback: (files: FileList | null) =>
+      handleFileLoad(files, (e) => {
+        /* const img = getEl('#seed-img') as HTMLImageElement */
+        const img = new Image()
+        img.onload = () => {
+          updateTexture(gl, { ...seedImg, data: img.src })
+        }
+        img.src = e.target?.result as string
+      }),
+  },
+  backplateImg: {
+    type: 'file',
+    callback: (files: FileList | null) => {
+      handleFileLoad(files, (e) => {
+        const img = getEl('#backplate-img') as HTMLImageElement
+        img.onload = () => {
+          img.classList.remove('hidden')
+        }
+        img.src = e.target?.result as string
+      })
+    },
+  },
+  maskImg: {
+    type: 'file',
+    callback: (files: FileList | null) => {
+      handleFileLoad(files, (e) => {
+        const el = getEl('.viewer') as HTMLDivElement
+        const img = new Image()
+        img.onload = () => {
+          el.style.maskImage = `url(${img.src})`
+          console.log(img.src)
+        }
+        img.src = e.target?.result as string
+      })
+    },
+  },
+  positionalDisplaceScale: {
+    type: 'range',
+    val: 0,
+    min: 0,
+    max: 5,
+  },
 }
 
 const mouse = [0, 0, 0]
 
-makeGui(settings)
-
-const update_vs = `#version 300 es
-  in vec2 a_position;
-  out vec2 v_position;
-
-  #define PI 3.1415926535897932384626433832795
-  #define aspect 1.0
-
-  uniform float a;
-  uniform float b;
-  uniform float m;
-  uniform float n;
-  uniform float vel;
-  uniform float minWalk;
-  uniform float time;
-  uniform sampler2D seedImg;
-  uniform float chladniDisplace;
-  uniform float imgDisplace;
-  uniform vec3 mouse;
-
-  float chladni(vec2 pos, float a, float b, float m, float n) {
-    return a * sin(PI * n * pos.x * aspect) * sin(PI * m * pos.y) + b * sin(PI * m * pos.x * aspect) * sin(PI * n * pos.y);
-  }
-
-  float random(vec2 pos) {
-    /* 0 < v < 1 */
-    return fract(sin(dot(pos.xy, vec2(12.9898, 78.233))) * 43758.5453);
-  }
-
-  float stoch(vec2 pos) {
-    float eq = chladni(pos, a, b, m, n) * chladniDisplace;
-    float displace = texture(seedImg, pos * 0.5 + vec2(0.5)).r * imgDisplace;
-    float newStoch = max((vel + displace) * 0.5 * abs(eq), minWalk);
-
-    return newStoch;
-  }
-
-  float randRange(float min, float max) {
-    return random(vec2(min, max)) * (max - min) + min;
-  }
-
-  vec2 move(vec2 pos, float stochasticAmp) {
-    float _x = randRange(-stochasticAmp, stochasticAmp);
-    float _y = randRange(-stochasticAmp, stochasticAmp);
-
-    vec2 newPos = pos + vec2(_x, _y);
-
-    return newPos;
-  }
-
-  vec2 bound(vec2 pos) {
-    vec2 newPos = pos;
-    if(pos.x > 1.0) newPos.x = -1.0;
-    if(pos.y > 1.0) newPos.y = -1.0;
-    if(pos.x < -1.0) newPos.x = 1.0;
-    if(pos.y < -1.0) newPos.y = 1.0;
-    return newPos;
-  }
-
-  void main(){
-    float stochasticAmp = stoch(a_position);
-    v_position = bound(move(a_position, stochasticAmp));
-
-    if(mouse.z > 0.5) {
-      int scale = 4;
-      float _x = float(gl_VertexID * scale % 512);
-      float _y = floor(float(gl_VertexID * scale) / 512.0);
-      v_position = vec2(_x, _y) / 512.0 * 2.0 - 1.0;
-    }
-  }
-`
-const update_fs = `#version 300 es
-	precision mediump float;
-
-	void main() {
-		discard;
-	}
-`
-
-const render_vs = `#version 300 es
-  in vec2 a_position;
-
-  void main(){
-    gl_PointSize = 1.5;
-		gl_Position = vec4(a_position, 0.0, 1.0);
-  }
-`
-const render_fs = `#version 300 es
-  precision mediump float;
-  uniform vec3 particleColor;
-  uniform sampler2D seedImg;
-  out vec4 outcolor;
-
-  void main(){
-    /* vec2 uv = gl_FragCoord.xy / vec2(512.0, 512.0); */
-    /* outcolor = texture(seedImg, uv); */
-    outcolor = vec4(particleColor, 1.0);
-  }
-`
+const gui = makeGui(settings)
+gui.classList.add('gui')
+appendEl(gui)
 
 const attribs = ['position']
 const update = shaderProgram(gl, {
@@ -191,20 +173,33 @@ const render = shaderProgram(gl, {
   fragShader: render_fs,
 })
 
+const gaussian = makeGaussian(
+  c.width / 2,
+  c.width,
+  c.height,
+  c.width / 2,
+  c.height / 2,
+)
+
 function initialParticleData(num_parts: number) {
   const data = []
   for (let i = 0; i < num_parts; ++i) {
-    // position
-    data.push(Math.random() * 2 - 1)
-    data.push(Math.random() * 2 - 1)
+    /* const x = i % c.width // % is the "modulo operator", the remainder of i / width; */
+    /* const y = Math.floor(i / c.width) */
+
+    /* const dist = gaussian(x, y) */
+    const dist = 0.3
+    const xp = Math.cos(Math.random() * Math.PI * 2) * dist
+    const yp = Math.sin(Math.random() * Math.PI * 2) * dist
+
+    data.push(xp, yp)
   }
   return new Float32Array(data)
 }
 
-const NUM_PARTICLES = 80000
+const NUM_PARTICLES = 100000
 const data = initialParticleData(NUM_PARTICLES)
 
-/**/
 const buffers = [
   gl.createBuffer() as WebGLBuffer,
   gl.createBuffer() as WebGLBuffer,
@@ -276,17 +271,9 @@ const state = [
   },
 ]
 
-const seedImg = createTexture(gl, {
-  name: 'seedImg',
-  type: 'UNSIGNED_BYTE',
-  format: 'RGBA',
-  internalFormat: 'RGBA',
-  data: seed,
-})
-
 let count = 0
 function step(time: number) {
-  gl.clearColor(...intRgbToFloat(hexToRgb(hexColors.pink)), 1.0)
+  /* gl.clearColor(...intRgbToFloat(hexToRgb(hexColors.pink)), 1.0) */
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   gl.useProgram(update)
   gl.bindVertexArray(state[count % 2].update)
@@ -322,7 +309,7 @@ function step(time: number) {
   gl.useProgram(render)
   setUniforms(renderUniformSetters, {
     particleColor: intRgbToFloat(hexToRgb(hexColors.red)),
-    seedImg,
+    backplateImg,
   })
   gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES)
   count++
@@ -332,6 +319,21 @@ function step(time: number) {
 
 c.addEventListener('mousedown', () => (mouse[2] = 1))
 c.addEventListener('mouseup', () => (mouse[2] = 0))
+c.addEventListener('mouseover', (e: MouseEvent) => {
+  settings.chladniDisplace.val = 0.1
+  settings.imgDisplace.val = 0.5
+})
+c.addEventListener('mousemove', (e: MouseEvent) => {
+  const scaledMouseX = e.clientX / c.width
+  const scaledMouseY = e.clientY / c.height
+
+  settings.a.val = scaledMouseX * 10
+  settings.b.val = 1 - scaledMouseX * 10
+  settings.m.val = scaledMouseY * 10
+  settings.n.val = 1 - scaledMouseY * 10
+
+  updateGuiValues(settings, gui)
+})
 
 window.requestAnimationFrame(step)
 

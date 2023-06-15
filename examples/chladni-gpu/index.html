@@ -1,19 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>chladni-gpu · @geomm</title>
-	<style>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>chladni-gpu · @geomm</title>
+    <style>
       body {
         margin: 0;
         padding: 0;
         overflow: hidden;
+        background-color: #fcbac6;
       }
-	</style>
-</head>
-<body>
-	<script type="module" src="/src/index.ts"></script>
-</body>
+      #seed-img {
+        display: none;
+      }
+      canvas,
+      img,
+      .viewer {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .gui {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        display: flex;
+        flex-direction: column;
+      }
+      #backplate-img {
+        object-fit: cover;
+        position: absolute;
+        object-position: center;
+        width: 100%;
+        height: 100%;
+      }
+      .viewer {
+        width: 512px;
+        height: 512px;
+        background-color: #fcbac6;
+        mask-size: contain;
+        -webkit-mask-size: contain;
+        mask-type: alpha;
+        -webkit-mask-type: alpha;
+        /*
+        mask-image: url(src/images/14_dither_mask.png);
+        -webkit-mask-image: url(src/images/14_dither_mask.png);
+        */
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <img id="seed-img" class="viewer" src="" alt="seed" /> -->
+    <!-- <img id="mask-img" class="viewer" src="" alt="seed" /> -->
+    <div class="viewer">
+      <img id="backplate-img" class="hidden" src="" alt="backplate" />
+    </div>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
 </html>
