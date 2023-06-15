@@ -1,5 +1,5 @@
 import type { StringMap } from '@geomm/api'
-import type { Settings } from '@geomm/dom'
+import type { Setting } from '@geomm/dom'
 import type { WGL2RC } from './api'
 import { setters } from './setters'
 
@@ -56,7 +56,9 @@ export const setUniforms = (
   }
 }
 
-export const uniformsFromSettings = (settings: Settings) => {
+export const uniformsFromSettings = (
+  settings: Exclude<Setting, { type: 'file' }>,
+) => {
   return Object.entries(settings).reduce(
     (uniforms, [name, setting]) => ({
       ...uniforms,

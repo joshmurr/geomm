@@ -1,14 +1,16 @@
 const isEventListener = (key: string) => key.startsWith('on')
 
+type CreateElOpts = {
+  [key: string]:
+    | number
+    | string
+    | EventListenerOrEventListenerObject
+    | ((e: MouseEvent) => void)
+}
+
 export const createEl = <T extends HTMLElement>(
   type: string,
-  opts?: {
-    [key: string]:
-      | number
-      | string
-      | EventListenerOrEventListenerObject
-      | ((e: MouseEvent) => void)
-  },
+  opts?: CreateElOpts,
 ): T => {
   const el = document.createElement(type) as T
   if (opts) {
@@ -37,3 +39,15 @@ export const appendEl = (
   p.appendChild(element)
   return element
 }
+
+export const prependEl = (
+  el: HTMLElement | string,
+  parent?: HTMLElement | null,
+) => {
+  const element = typeof el === 'string' ? createEl<HTMLElement>(el) : el
+  const p = parent || document.body
+  p.prepend(element)
+  return element
+}
+
+export const getEl = (selector: string) => document.querySelector(selector)

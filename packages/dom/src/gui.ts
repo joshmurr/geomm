@@ -1,42 +1,54 @@
-import { appendEl, createEl } from '.'
+import { createEl } from '.'
 import type { Settings } from './api'
 
 export const makeGui = (settings: Settings) => {
   const gui = createEl('div') as HTMLDivElement
   gui.classList.add('gui')
   Object.entries(settings).forEach(([key, setting]) => {
-    const entry = createEl('div')
-    const label = createEl('span')
+    const label = createEl('label') as HTMLLabelElement
+    label.htmlFor = key
     label.innerText = key
-    entry.appendChild(label)
+    gui.appendChild(label)
+
     switch (setting.type) {
       case 'checkbox':
-        entry.appendChild(
+        gui.appendChild(
           createEl('input', {
             type: 'checkbox',
+            id: key,
             onchange: (e: MouseEvent) => {
               const val = (e.target as HTMLInputElement).checked
-              settings[key].val = val
+              setting.val = val
             },
           }),
         )
-        gui.appendChild(entry)
         break
 
       case 'range':
-        entry.appendChild(
+        gui.appendChild(
           createEl('input', {
             type: 'range',
+            id: key,
             min: setting.min,
             max: setting.max,
             value: setting.val,
             oninput: (e: MouseEvent) => {
               const val = parseFloat((e.target as HTMLInputElement).value)
-              settings[key].val = val * (setting?.scale || 1)
+              setting.val = val * (setting?.scale || 1)
             },
           }),
         )
-        gui.appendChild(entry)
+        break
+
+      case 'file':
+        gui.appendChild(
+          createEl('input', {
+            type: 'file',
+            id: key,
+            onchange: (e: MouseEvent) =>
+              setting.callback((e.target as HTMLInputElement).files),
+          }),
+        )
         break
 
       default: {
@@ -47,5 +59,21 @@ export const makeGui = (settings: Settings) => {
     }
   })
 
-  appendEl(gui)
+  return gui
+}
+
+export const updateGuiValues = (settings: Settings, gui: HTMLDivElement) => {
+  Object.entries(settings).forEach(([key, setting]) => {
+    const el = gui.querySelector(`#${key}`) as HTMLInputElement
+    switch (setting.type) {
+      case 'range':
+        el.value = `${setting.val / (setting?.scale || 1)}`
+        break
+      case 'checkbox':
+        el.checked = setting.val
+        break
+      default:
+        return null
+    }
+  })
 }

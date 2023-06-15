@@ -67,6 +67,11 @@ export const updateTexture = (gl: WGL2RC, opts: TextureOptsOut) => {
     new Uint8ClampedArray(
       Array.from({ length: width * height }, () => pixel).flat(),
     )
+
+  /* TODO: Handle image as HTML element.
+    Currently passing img.src is the workaround
+  */
+
   gl.bindTexture(gl.TEXTURE_2D, texture)
   gl.texImage2D(
     gl.TEXTURE_2D,

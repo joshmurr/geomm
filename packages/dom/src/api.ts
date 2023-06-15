@@ -10,6 +10,10 @@ export type Setting =
       type: 'checkbox'
       val: boolean
     }
+  | {
+      type: 'file'
+      callback: (file: FileList | null) => void
+    }
 
 export type Settings = {
   [key: string]: Setting
