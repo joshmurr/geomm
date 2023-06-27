@@ -382,10 +382,29 @@ const render = shaderProgram(gl, {
 const NUM_PARTICLES = 100000
 
 initPreviews([
-  { id: 'seed-img-preview', className: 'hidden', src: '' },
-  { id: 'mask-img-preview', className: 'hidden', src: '' },
-  { id: 'backplate-img-preview', className: 'hidden', src: '' },
-  { id: 'displacement-img-preview', src: displacementImg },
+  {
+    id: 'seed-img-preview',
+    className: 'hidden',
+    src: '',
+    note: 'A PNG to define where the dots should be placed initially. Dots will be places on black, rest should be transparent.',
+  },
+  {
+    id: 'mask-img-preview',
+    className: 'hidden',
+    src: '',
+    note: 'A PNG mask for the backplate image. Annoyingly inverted, so black is what will be seen, transparent will be masked.',
+  },
+  {
+    id: 'backplate-img-preview',
+    className: 'hidden',
+    src: '',
+    note: 'An image to be should behind the dots. Can be masked with a mask image.',
+  },
+  {
+    id: 'displacement-img-preview',
+    src: displacementImg,
+    note: 'Helps steer the movements of the dots in the simulation. White to black can be thought of as high-energy to low-energy where high-energy means more movement.',
+  },
 ])
 
 const context = new AudioContext()

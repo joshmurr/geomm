@@ -5,6 +5,10 @@ export const initPreviews = (descs: Array<{ [key: string]: string }>) => {
     withChildren(createEl('div', { className: 'preview-item' }), [
       createEl('img', desc),
       createEl<HTMLSpanElement>('span', { innerText: desc.id }),
+      createEl<HTMLSpanElement>('span', {
+        innerText: desc.note,
+        className: 'tooltip',
+      }),
     ]),
   )
 

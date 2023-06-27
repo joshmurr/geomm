@@ -11,6 +11,7 @@
         padding: 0;
         overflow: hidden;
         background-color: #fcbac6;
+        font-family: sans-serif;
       }
       .gui {
         position: absolute;
@@ -84,6 +85,8 @@
         width: 200px;
         background-color: lightgrey;
         aspect-ratio: 1;
+        position: relative;
+        padding-bottom: 1.2rem;
       }
 
       .preview-item img {
@@ -91,6 +94,29 @@
         height: 100%;
         object-fit: cover;
         object-position: center;
+      }
+
+      .preview-item span {
+        position: absolute;
+        bottom: 0;
+      }
+
+      .preview-item .tooltip {
+        cursor: help;
+        display: none;
+      }
+
+      .preview-item:hover .tooltip {
+        display: block;
+      }
+
+      .tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+        padding: 0.2rem;
       }
 
       .hidden {
