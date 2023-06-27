@@ -15,16 +15,18 @@ export const update_vs = `#version 300 es
   uniform float vel;
   uniform float minWalk;
   uniform float time;
-  uniform float positionalDisplaceScale;
-  uniform sampler2D seedImg;
+  uniform float displaceFromCenter;
+  uniform sampler2D displacementImg;
   uniform float chladniDisplace;
   uniform float imgDisplace;
   uniform vec3 mouse;
+  uniform sampler2D audioTex;
 
   ${hash22}
 
   float chladni(vec2 pos, float a, float b, float m, float n) {
-    return a * sin(PI * n * pos.x * aspect) * sin(PI * m * pos.y) + b * sin(PI * m * pos.x * aspect) * sin(PI * n * pos.y);
+    return a * sin(PI * n * pos.x * aspect) * sin(PI * m * pos.y) +
+           b * sin(PI * m * pos.x * aspect) * sin(PI * n * pos.y);
   }
 
   float rand(vec2 n) {
@@ -38,9 +40,33 @@ export const update_vs = `#version 300 es
   }
 
   float stoch(vec2 pos) {
-    float eq = chladni(pos, a, b, m, n) * chladniDisplace;
-    float displace = texture(seedImg, pos * 0.5 + vec2(0.5)).r * imgDisplace;
-    float positionalDisplace = smoothstep(1.8, 4.8, 1.0 / length(pos)) * positionalDisplaceScale;
+    float lower = 1.0;
+    float lowMid = 1.0;
+    float highMid = 1.0;
+    float higher = 1.0;
+
+    for (float i = 0.0; i < 512.0; i+=64.0) {
+      float u = i / 512.0;
+      float fft = texture(audioTex, vec2(u, 0)).r;
+      if (u < 0.25) {
+        lower += fft;
+      } else if (u < 0.5) {
+        lowMid += fft;
+      } else if (u < 0.75) {
+        highMid += fft;
+      } else {
+        higher += fft;
+      }
+
+      /* lower /= 64.0; */
+      /* lowMid /= 64.0; */
+      /* highMid /= 64.0; */
+      /* higher /= 64.0; */
+    }
+
+    float eq = chladni(pos, a + lower, b + lowMid, m + lower, n + lowMid) * chladniDisplace;
+    float displace = texture(displacementImg, pos * 0.5 + vec2(0.5)).r * imgDisplace;
+    float positionalDisplace = smoothstep(1.8, 2.2, 1.0 / length(pos)) * displaceFromCenter;
     float newStoch = max((vel + displace + positionalDisplace) * 0.5 * abs(eq), minWalk);
 
     return newStoch;
@@ -68,15 +94,17 @@ export const update_vs = `#version 300 es
   }
 
   void main(){
+
     float stochasticAmp = stoch(a_position);
     v_position = bound(move(a_position, stochasticAmp));
 
-    if(mouse.z > 0.5) {
+
+    /* if(mouse.z > 0.5) {
       int scale = 3;
       float _x = float(gl_VertexID * scale % 512);
       float _y = floor(float(gl_VertexID * scale) / 512.0);
       v_position = vec2(_x, _y) / 512.0 * 2.0 - 1.0;
-    }
+    } */
   }
 `
 export const update_fs = `#version 300 es

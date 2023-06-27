@@ -12,55 +12,93 @@
         overflow: hidden;
         background-color: #fcbac6;
       }
-      #seed-img {
-        display: none;
-      }
-      canvas,
-      img,
-      .viewer {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
       .gui {
         position: absolute;
         top: 0;
         right: 0;
-
         display: flex;
         flex-direction: column;
+        z-index: 100;
+        gap: 0.2rem;
+        background-color: rgba(255, 255, 255, 0.3);
+        margin: 0.4rem;
+        padding: 0.4rem;
+        border-radius: 0.2rem;
       }
-      #backplate-img {
-        object-fit: cover;
+
+      .gui-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.2rem;
+      }
+
+      .gui-item:not(:last-of-type) {
+        border-bottom: 1px solid black;
+      }
+
+      .output-wrapper {
+        position: relative;
+        margin: 1rem;
+      }
+
+      .output-wrapper .masked-backplate {
         position: absolute;
-        object-position: center;
-        width: 100%;
-        height: 100%;
-      }
-      .viewer {
+        top: 0;
+        left: 0;
         width: 512px;
         height: 512px;
-        background-color: #fcbac6;
         mask-size: contain;
         -webkit-mask-size: contain;
         mask-type: alpha;
         -webkit-mask-type: alpha;
-        /*
-        mask-image: url(src/images/14_dither_mask.png);
-        -webkit-mask-image: url(src/images/14_dither_mask.png);
-        */
+        z-index: -1;
       }
+
+      .masked-backplate {
+        width: 100%;
+        height: 100%;
+      }
+
+      #backplate-img {
+        object-fit: cover;
+        object-position: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .preview-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: black;
+        gap: 0.4em;
+        padding: 0.4em;
+      }
+
+      .preview-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 200px;
+        background-color: lightgrey;
+        aspect-ratio: 1;
+      }
+
+      .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+
       .hidden {
         display: none;
       }
     </style>
   </head>
   <body>
-    <!-- <img id="seed-img" class="viewer" src="" alt="seed" /> -->
-    <!-- <img id="mask-img" class="viewer" src="" alt="seed" /> -->
-    <div class="viewer">
-      <img id="backplate-img" class="hidden" src="" alt="backplate" />
-    </div>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>
