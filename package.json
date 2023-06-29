@@ -30,6 +30,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@geomm/algorithm": "^1.0.0"
+    "@geomm/algorithm": "^1.0.0",
+    "vite": "^4.3.9"
   }
 }

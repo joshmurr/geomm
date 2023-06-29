@@ -12,14 +12,14 @@
   },
   "devDependencies": {
     "typescript": "^4.9.4",
-    "vite": "^3.2.0"
+    "vite": "^4.3.9"
   },
   "dependencies": {
     "@geomm/core": "^1.0.0",
     "@geomm/dom": "^1.0.0",
     "@geomm/geometry": "^1.0.0",
-    "@geomm/webgl": "^1.0.0",
     "@geomm/maths": "^1.0.0",
+    "@geomm/webgl": "^1.0.0",
     "gl-matrix": "^3.4.3"
   },
   "browser": {

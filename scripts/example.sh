@@ -42,7 +42,7 @@ EOF
 	},
 	"devDependencies": {
 		"typescript": "^4.9.4",
-		"vite": "^3.2.0"
+		"vite": "^4.3.9"
 	},
 	"dependencies": {
 		"@geomm/api": "^1.0.0"
