@@ -117,9 +117,10 @@ export const update_fs = `#version 300 es
 
 export const render_vs = `#version 300 es
   in vec2 a_position;
+  uniform float particleSize;
 
   void main(){
-    gl_PointSize = 1.8;
+    gl_PointSize = particleSize;
 		gl_Position = vec4(a_position, 0.0, 1.0);
   }
 `
@@ -130,6 +131,10 @@ export const render_fs = `#version 300 es
   out vec4 outcolor;
 
   void main(){
+    float distance = length(2.0 * gl_PointCoord - 1.0);
+    if (distance > 1.0) {
+            discard;
+    }
     outcolor = vec4(particleColor, 1.0);
   }
 `

@@ -100,6 +100,22 @@ const settings: Settings = {
     min: 0,
     max: 5,
   },
+
+  particleSize: {
+    type: 'range',
+    val: 1.8,
+    min: 0,
+    max: 5,
+  },
+
+  particleCount: {
+    type: 'range',
+    val: 100000,
+    min: 0,
+    max: 1000000,
+    callback: () => init(),
+  },
+
   particleSeed: {
     type: 'select',
     val: 'circle',
@@ -429,7 +445,7 @@ const audioTex = createTexture(gl, {
 })
 
 async function init() {
-  const data = await selectedInitialDataFn(NUM_PARTICLES)
+  const data = await selectedInitialDataFn(settings.particleCount.val)
   const numParticles = data.length / 2
 
   recordButton = getEl('#record') as HTMLButtonElement
@@ -549,6 +565,7 @@ async function init() {
     gl.bindVertexArray(state[++count % 2].render)
     gl.useProgram(render)
     setUniforms(renderUniformSetters, {
+      particleSize: settings.particleSize.val,
       particleColor: intRgbToFloat(
         hexToRgb(
           hexColors[settings.particleColor.val as keyof typeof hexColors],
