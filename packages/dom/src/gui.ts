@@ -1,18 +1,22 @@
-import { createEl } from '.'
+import { createEl, withChildren } from '.'
 import type { Settings } from './api'
 
 export const makeGui = (settings: Settings) => {
   const gui = createEl('div') as HTMLDivElement
   gui.classList.add('gui')
   Object.entries(settings).forEach(([key, setting]) => {
+    const guiItem = createEl('div') as HTMLDivElement
+    guiItem.classList.add('gui-item')
+    gui.appendChild(guiItem)
+
     const label = createEl('label') as HTMLLabelElement
     label.htmlFor = key
     label.innerText = key
-    gui.appendChild(label)
+    guiItem.appendChild(label)
 
     switch (setting.type) {
       case 'checkbox':
-        gui.appendChild(
+        guiItem.appendChild(
           createEl('input', {
             type: 'checkbox',
             id: key,
@@ -25,7 +29,7 @@ export const makeGui = (settings: Settings) => {
         break
 
       case 'range':
-        gui.appendChild(
+        guiItem.appendChild(
           createEl('input', {
             type: 'range',
             id: key,
@@ -41,12 +45,45 @@ export const makeGui = (settings: Settings) => {
         break
 
       case 'file':
-        gui.appendChild(
+        guiItem.appendChild(
           createEl('input', {
             type: 'file',
             id: key,
             onchange: (e: MouseEvent) =>
               setting.callback((e.target as HTMLInputElement).files),
+          }),
+        )
+        break
+
+      case 'select':
+        guiItem.appendChild(
+          withChildren(
+            createEl('select', {
+              id: key,
+              onchange: (e: MouseEvent) => {
+                const val = (e.target as HTMLSelectElement).value
+                setting.val = val
+                setting.callback?.(val)
+              },
+            }),
+            setting.options.map((option) => {
+              const el = createEl('option') as HTMLOptionElement
+              el.value = option
+              el.innerText = option
+              if (option === setting.val)
+                el.setAttribute('selected', 'selected')
+              return el
+            }),
+          ),
+        )
+        break
+
+      case 'button':
+        guiItem.appendChild(
+          createEl('button', {
+            id: key,
+            onclick: (e: MouseEvent) => setting.callback(e),
+            innerText: setting.val,
           }),
         )
         break

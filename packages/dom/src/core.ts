@@ -23,7 +23,9 @@ export const createEl = <T extends HTMLElement>(
         return
       }
 
-      el.setAttribute(key, opts[key].toString())
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      el[key] = opts[key].toString()
     })
   }
 
@@ -48,6 +50,14 @@ export const prependEl = (
   const p = parent || document.body
   p.prepend(element)
   return element
+}
+
+export const withChildren = (
+  el: HTMLElement,
+  children: HTMLElement[],
+): HTMLElement => {
+  children.forEach((child) => el.appendChild(child))
+  return el
 }
 
 export const getEl = (selector: string) => document.querySelector(selector)
