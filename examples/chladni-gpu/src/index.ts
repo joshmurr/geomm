@@ -33,8 +33,6 @@ import { initOutput, initPreviews } from './domHandlers'
 const initialDataFns = [circle, invCircle, square, fromFaceImg, random]
 let selectedInitialDataFn = circle
 
-const { c, gl } = initOutput()
-
 const settings: Settings = {
   minWalk: {
     type: 'range',
@@ -105,13 +103,22 @@ const settings: Settings = {
     type: 'range',
     val: 1.8,
     min: 0,
-    max: 5,
+    max: 100,
+    scale: 0.1,
   },
 
   particleCount: {
     type: 'range',
     val: 100000,
     min: 0,
+    max: 1000000,
+    callback: () => init(),
+  },
+
+  canvasSize: {
+    type: 'range',
+    val: 512,
+    min: 128,
     max: 1000000,
     callback: () => init(),
   },
@@ -248,6 +255,7 @@ const settings: Settings = {
     },
   },
 }
+const { c, gl } = initOutput(800, 800)
 
 let audio: HTMLAudioElement
 const mediaSource = new MediaSource()
@@ -255,10 +263,6 @@ mediaSource.addEventListener('sourceopen', handleSourceOpen, false)
 let mediaRecorder: MediaRecorder
 let recordedBlobs: Blob[]
 let sourceBuffer: SourceBuffer
-
-/* const canvas = document.querySelector('canvas') */
-const video = createEl<HTMLVideoElement>('video')
-appendEl(video)
 
 let recordButton: HTMLButtonElement
 let playButton: HTMLButtonElement
@@ -395,20 +399,11 @@ const render = shaderProgram(gl, {
   fragShader: render_fs,
 })
 
-const NUM_PARTICLES = 100000
-
 initPreviews([
   {
-    id: 'seed-img-preview',
-    className: 'hidden',
-    src: '',
-    note: 'A PNG to define where the dots should be placed initially. Dots will be places on black, rest should be transparent.',
-  },
-  {
-    id: 'mask-img-preview',
-    className: 'hidden',
-    src: '',
-    note: 'A PNG mask for the backplate image. Annoyingly inverted, so black is what will be seen, transparent will be masked.',
+    id: 'displacement-img-preview',
+    src: displacementImg,
+    note: 'Helps steer the movements of the dots in the simulation. White to black can be thought of as high-energy to low-energy where high-energy means more movement.',
   },
   {
     id: 'backplate-img-preview',
@@ -417,9 +412,16 @@ initPreviews([
     note: 'An image to be should behind the dots. Can be masked with a mask image.',
   },
   {
-    id: 'displacement-img-preview',
-    src: displacementImg,
-    note: 'Helps steer the movements of the dots in the simulation. White to black can be thought of as high-energy to low-energy where high-energy means more movement.',
+    id: 'mask-img-preview',
+    className: 'hidden',
+    src: '',
+    note: 'A PNG mask for the backplate image. Annoyingly inverted, so black is what will be seen, transparent will be masked.',
+  },
+  {
+    id: 'seed-img-preview',
+    className: 'hidden',
+    src: '',
+    note: 'A PNG to define where the dots should be placed initially. Dots will be places on black, rest should be transparent.',
   },
 ])
 

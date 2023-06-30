@@ -20,8 +20,11 @@ export const initPreviews = (descs: Array<{ [key: string]: string }>) => {
   return wrapper
 }
 
-export const initOutput = () => {
-  const c = createEl('canvas', { width: 512, height: 512 }) as HTMLCanvasElement
+export const initOutput = (width: number, height: number) => {
+  const c = createEl('canvas', {
+    width,
+    height,
+  }) as HTMLCanvasElement
   const gl = c.getContext('webgl2') as WebGL2RenderingContext
 
   const maskedBackplate = withChildren(
