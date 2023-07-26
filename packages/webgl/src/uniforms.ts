@@ -61,7 +61,7 @@ export const uniformsFromSettings = (settings: Settings) => {
     if (setting.type === 'file') return uniforms
     return {
       ...uniforms,
-      [name]: setting.val,
+      [name]: Number(setting.val),
     }
   }, {})
 }

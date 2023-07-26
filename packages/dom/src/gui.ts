@@ -11,7 +11,7 @@ export const makeGui = (settings: Settings) => {
 
     const label = createEl('label') as HTMLLabelElement
     label.htmlFor = key
-    label.innerText = key
+    label.innerText = setting.displayName || key
     guiItem.appendChild(label)
 
     switch (setting.type) {
@@ -20,6 +20,7 @@ export const makeGui = (settings: Settings) => {
           createEl('input', {
             type: 'checkbox',
             id: key,
+            checked: setting.val.toString(),
             onchange: (e: MouseEvent) => {
               const val = (e.target as HTMLInputElement).checked
               setting.val = val
@@ -38,7 +39,7 @@ export const makeGui = (settings: Settings) => {
             value: setting.val,
             oninput: (e: MouseEvent) => {
               const val = parseFloat((e.target as HTMLInputElement).value)
-              setting.val = val * (setting?.scale || 1)
+              setting.val = val * (setting?.scale || 1) + (setting?.offset || 0)
             },
           }),
         )
