@@ -1,11 +1,4 @@
-import {
-  appendEl,
-  createEl,
-  getEl,
-  makeGui,
-  Settings,
-  updateGuiValues,
-} from '@geomm/dom'
+import { appendEl, getEl, makeGui, Settings, updateGuiValues } from '@geomm/dom'
 import {
   createBufferInfo,
   createTexture,
@@ -111,14 +104,6 @@ const settings: Settings = {
     type: 'range',
     val: 100000,
     min: 0,
-    max: 1000000,
-    callback: () => init(),
-  },
-
-  canvasSize: {
-    type: 'range',
-    val: 512,
-    min: 128,
     max: 1000000,
     callback: () => init(),
   },
@@ -585,14 +570,14 @@ async function init() {
     mouse[2] = 1
   })
   c.addEventListener('mouseup', () => (mouse[2] = 0))
-  c.addEventListener('mouseover', () => {
-    settings.chladniDisplace.val = 0.08
-    settings.imgDisplace.val = 0.1
-  })
-  c.addEventListener('mouseout', () => {
-    settings.chladniDisplace.val = 0.01
-    settings.imgDisplace.val = 0.02
-  })
+  /* c.addEventListener('mouseover', () => { */
+  /*   settings.chladniDisplace.val = 0.08 */
+  /*   settings.imgDisplace.val = 0.1 */
+  /* }) */
+  /* c.addEventListener('mouseout', () => { */
+  /*   settings.chladniDisplace.val = 0.01 */
+  /*   settings.imgDisplace.val = 0.02 */
+  /* }) */
   c.addEventListener('mousemove', (e: MouseEvent) => {
     const scaledMouseX = e.clientX / c.width
     const scaledMouseY = e.clientY / c.height

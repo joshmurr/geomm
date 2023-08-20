@@ -7,6 +7,7 @@ export type Setting =
       max: number
       scale?: number
       offset?: number
+      callback?: (e: Event) => void
     }
   | {
       type: 'checkbox'

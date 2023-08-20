@@ -41,6 +41,8 @@ export const makeGui = (settings: Settings) => {
               const val = parseFloat((e.target as HTMLInputElement).value)
               setting.val = val * (setting?.scale || 1) + (setting?.offset || 0)
             },
+            onchange: (e: MouseEvent) =>
+              setting.callback && setting.callback(e),
           }),
         )
         break
