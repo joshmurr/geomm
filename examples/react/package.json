@@ -1,0 +1,32 @@
+{
+	"name": "@example/react",
+	"version": "0.0.1",
+	"private": true,
+	"description": "TODO",
+	"repository": "https://github.com/joshmurr/geomm",
+	"author": "Josh Murr",
+	"scripts": {
+		"start": "vite --open",
+		"build": "tsc && vite build --base='./'",
+		"preview": "vite preview --host --open"
+	},
+	"devDependencies": {
+		"@types/react-dom": "^18.2.7",
+		"typescript": "^4.9.4",
+		"vite": "^4.3.9",
+    "@types/react": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3"
+	},
+	"dependencies": {
+		"@geomm/api": "^1.0.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
+	"browser": {
+		"process": false
+	}
+}
