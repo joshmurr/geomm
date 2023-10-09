@@ -2,15 +2,9 @@
  * https://web.archive.org/web/20191117195626/http://codeflow.org/entries/2010/nov/29/verlet-collision-with-impulse-preservation/
  */
 import { appendEl, createEl } from '@geomm/dom'
-import { add, distance, mag, mul, scale, sub, Vec, vec } from '@geomm/geometry'
+import { add, dot, mag, scale, sub, Vec, vec } from '@geomm/geometry'
 import { randInt, randRange, sqrt } from '@geomm/maths'
-import {
-  drawGrid,
-  drawGridCell,
-  drawGridNumbered,
-  getCellPos,
-  getHashBucketIndex,
-} from './grid'
+import { getCellPos } from './grid'
 
 type Particle = {
   pos: Vec
@@ -21,18 +15,18 @@ type Particle = {
 }
 
 const settings = {
-  N_PARTICLES: 1,
+  N_PARTICLES: 500,
   RADIUS: 8,
 }
 
-const SIZE = vec(1000, 1000)
-const GRAVITY = vec(0, 0.01)
+const { innerWidth, innerHeight } = window
+const SIZE = vec(innerWidth, innerHeight)
+const GRAVITY = vec(0, 0.5)
+const DAMPING = 0.5
 
 const CELL_SIZE = settings.RADIUS
 
-const N_BUCKETS = ((SIZE.x / CELL_SIZE) * SIZE.y) / CELL_SIZE
-
-console.log('BUCKETS', N_BUCKETS)
+/* const N_BUCKETS = ((SIZE.x / CELL_SIZE) * SIZE.y) / CELL_SIZE */
 
 const c = createEl('canvas', {
   width: SIZE.x,
@@ -43,27 +37,9 @@ appendEl(c)
 
 const particles: Particle[] = []
 
-const useMyParticles = () => {
-  particles.push({
-    pos: vec(100, 100),
-    prevPos: vec(100, 100),
-    acc: vec(0, 0),
-    mass: settings.RADIUS,
-    col: '#fff',
-  })
-
-  particles.push({
-    pos: vec(200, 200),
-    prevPos: vec(200, 200),
-    acc: vec(0, 0),
-    mass: settings.RADIUS,
-    col: '#fff',
-  })
-}
-
 const placeParticles = () => {
   while (particles.length < settings.N_PARTICLES) {
-    const mass = settings.RADIUS // randInt(5, 8)
+    const mass = settings.RADIUS
     const initialPos = vec(
       randRange(mass, SIZE.x - mass),
       randRange(mass, SIZE.y - mass),
@@ -73,7 +49,7 @@ const placeParticles = () => {
       pos: initialPos,
       prevPos: initialPos,
       acc: vec(0, 0),
-      mass,
+      mass: randInt(settings.RADIUS, settings.RADIUS),
       col,
     }
 
@@ -94,6 +70,24 @@ const placeParticles = () => {
   }
 }
 
+const particleStream = (pos: Vec, dir = vec(1, 0), n = Infinity) => {
+  const mass = settings.RADIUS
+  const col = '#fff'
+  const p = {
+    pos,
+    prevPos: sub(pos, vec(2, 0)),
+    acc: vec(0, 0),
+    mass,
+    col,
+  }
+  particles.push(p)
+  if (n > 0) {
+    setTimeout(() => {
+      particleStream(pos, dir, n - 1)
+    }, 50)
+  }
+}
+
 const accelerate = (p: Particle, dt: number) => {
   const { pos, acc } = p
   p.pos = add(pos, scale(acc, dt * dt))
@@ -102,8 +96,6 @@ const accelerate = (p: Particle, dt: number) => {
 
 const inertia = (p: Particle) => {
   const { pos, prevPos } = p
-  const vel = distance(pos, prevPos)
-  p.col = `hsl(${vel * 360}, 100%, 50%)`
   p.prevPos = pos
   p.pos = sub(scale(pos, 2), prevPos)
 }
@@ -114,12 +106,9 @@ const applyForce = (p: Particle, force: Vec) => {
 }
 
 const simpleConstrain = (p: Particle) => {
-  const { pos, prevPos, mass } = p
-  const diff = sub(pos, prevPos)
+  const { pos, mass } = p
   if (pos.x < mass) {
     pos.x = mass
-    // this.old_x = this.x + vel_x;
-    prevPos.x = pos.x + diff.x
   } else if (pos.x > SIZE.x - mass) {
     pos.x = SIZE.x - mass
   }
@@ -130,42 +119,78 @@ const simpleConstrain = (p: Particle) => {
   }
 }
 
-const checkCollisions = (p: Particle, idx: number, preserveImpulse = false) => {
+const preserveImpulseConstrain = (p: Particle) => {
+  const { pos, prevPos, mass } = p
+  if (pos.x < mass) {
+    const vx = (pos.x - prevPos.x) * DAMPING
+    pos.x = mass
+    prevPos.x = pos.x + vx
+  } else if (pos.x > SIZE.x - mass) {
+    const vx = (pos.x - prevPos.x) * DAMPING
+    pos.x = SIZE.x - mass
+    prevPos.x = pos.x + vx
+  }
+  if (pos.y < mass) {
+    const vy = (pos.y - prevPos.y) * DAMPING
+    pos.y = mass
+    prevPos.y = pos.y - vy
+  } else if (pos.y > SIZE.y - mass) {
+    const vy = (pos.y - prevPos.y) * DAMPING
+    pos.y = SIZE.y - mass
+    prevPos.y = pos.y - vy
+  }
+}
+
+const collide = (p: Particle, p2: Particle, preserveImpulse = false) => {
   const { pos, mass } = p
+  const { pos: pos2, mass: mass2 } = p2
+  const v = sub(pos, pos2)
+  const distSq = v.x * v.x + v.y * v.y
+  const minDist = mass + mass2
 
-  for (let i = idx + 1; i < particles.length; i++) {
-    const p2 = particles[i]
-    const { pos: pos2, mass: mass2 } = p2
-    const v = sub(pos, pos2)
-    const distSq = v.x * v.x + v.y * v.y
-    const minDist = mass + mass2
+  if (distSq < minDist * minDist) {
+    const dist = sqrt(distSq)
+    const factor = (dist - minDist) / dist
 
-    if (distSq < minDist * minDist) {
-      const dist = sqrt(distSq)
-      const factor = (dist - minDist) / dist
+    /* Resolve the overlapping bodies */
+    const displacement = scale(v, factor * 0.5)
+    p.pos = sub(p.pos, displacement)
+    p2.pos = add(p2.pos, displacement)
 
-      const displacement = scale(v, factor * 0.5)
+    if (preserveImpulse) {
+      /* Compute the projected componetn factors */
+      const v1 = sub(pos, p.prevPos)
+      const v2 = sub(pos2, p2.prevPos)
+      const f1 = (DAMPING * dot(v1, v)) / distSq
+      const f2 = (DAMPING * dot(v2, v)) / distSq
 
-      p.pos = sub(p.pos, displacement)
-      p2.pos = add(p2.pos, displacement)
+      /* Swap the projected components */
+      const v1p = add(v1, sub(scale(v, f2), scale(v, f1)))
+      const v2p = add(v2, sub(scale(v, f1), scale(v, f2)))
 
-      /* if(preserveImpulse) { */
-      /*   const damping = 0.5 */
-      /*   const { prevPos } = p */
-      /*   const { prevPos: prevPos2 } = p2 */
-      /*   const v1 = sub(pos, prevPos) */
-      /*   const v2 = sub(pos2, prevPos2) */
-      /*   const f1 = scale(scale(mul(v, v1), damping), 1 / distSq) */
-      /*   const f2 = scale(scale(mul(v, v2), damping), 1 / distSq) */
-      /**/
-      /* } */
+      /* Previous pos is adjusted by the projected component */
+      p.prevPos = sub(pos, v1p)
+      p2.prevPos = sub(pos2, v2p)
+    }
+  }
+}
+
+const checkCollisions = (particles: Particle[], preserveImpulse = false) => {
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i]
+    for (let j = i + 1; j < particles.length; j++) {
+      const p2 = particles[j]
+      collide(p, p2, preserveImpulse)
     }
   }
 }
 
 const vecId = (v: Vec) => `${v.x},${v.y}`
 
-const checkCollisionsGrid = (particles: Particle[]) => {
+const checkCollisionsGrid = (
+  particles: Particle[],
+  preserveImpulse: boolean,
+) => {
   const grid = new Map()
   particles.forEach((p) => {
     const { pos } = p
@@ -192,23 +217,9 @@ const checkCollisionsGrid = (particles: Particle[]) => {
   for (const bucket of grid.values()) {
     for (let i = 0; i < bucket.length; i++) {
       const p = bucket[i]
-      const { pos, mass } = p
       for (let j = i + 1; j < bucket.length; j++) {
         const p2 = bucket[j]
-        const { pos: pos2, mass: mass2 } = p2
-        const v = sub(pos, pos2)
-        const distSq = v.x * v.x + v.y * v.y
-        const minDist = mass + mass2
-
-        if (distSq < minDist * minDist) {
-          const dist = sqrt(distSq)
-          const factor = (dist - minDist) / dist
-
-          const displacement = scale(v, factor * 0.5)
-
-          p.pos = sub(p.pos, displacement)
-          p2.pos = add(p2.pos, displacement)
-        }
+        collide(p, p2, preserveImpulse)
       }
     }
   }
@@ -219,7 +230,7 @@ let lastLoop = performance.now()
 let thisLoop = lastLoop
 let frameTime = 0
 
-const steps = 1
+const steps = 8
 const dt = 1 / steps
 const step = () => {
   ctx.clearRect(0, 0, SIZE.x, SIZE.y)
@@ -228,9 +239,11 @@ const step = () => {
     particles.forEach((p) => applyForce(p, GRAVITY))
     particles.forEach((p) => accelerate(p, dt))
     /* particles.forEach((p, i) => checkCollisions(p, i)) */
-    checkCollisionsGrid(particles)
+    checkCollisionsGrid(particles, false)
     particles.forEach((p) => simpleConstrain(p))
     particles.forEach((p) => inertia(p))
+    checkCollisionsGrid(particles, true)
+    particles.forEach((p) => preserveImpulseConstrain(p))
   }
 
   ctx.fillStyle = '#000'
@@ -242,11 +255,6 @@ const step = () => {
     ctx.beginPath()
     ctx.arc(pos.x, pos.y, mass, 0, Math.PI * 2)
     ctx.fill()
-
-    /* ctx.fillStyle = '#fff' */
-    /* ctx.beginPath() */
-    /* ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2) */
-    /* ctx.fill() */
   })
 
   /* drawGridNumbered(ctx, CELL_SIZE, SIZE.x, SIZE.y) */
@@ -260,15 +268,35 @@ const step = () => {
 }
 
 const fpsOut = document.getElementById('fps') as HTMLPreElement
-setInterval(function() {
-  fpsOut.innerHTML = `n particles: ${settings.N_PARTICLES}
+setInterval(function () {
+  fpsOut.innerHTML = `n particles: ${particles.length}
 ${(1000 / frameTime).toFixed(1)}fps`
 }, 1000)
 
 placeParticles()
-/* useMyParticles() */
+/* particleStream(vec(100, 50)) */
 
-window.addEventListener('click', () => {
-  for (let i = 0; i < 5; i++) requestAnimationFrame(step)
+window.addEventListener('resize', () => {
+  const { innerWidth, innerHeight } = window
+  SIZE.x = innerWidth
+  SIZE.y = innerHeight
+  c.width = SIZE.x
+  c.height = SIZE.y
 })
+
+window.addEventListener(
+  'devicemotion',
+  (e) => {
+    const accX = -e.accelerationIncludingGravity.x
+    const accY = e.accelerationIncludingGravity.y
+
+    const deviceOut = document.getElementById('device') as HTMLPreElement
+    deviceOut.innerHTML = `accX: ${accX.toFixed(1)} accY: ${accY.toFixed(1)}`
+
+    GRAVITY.x = accX * 0.1
+    GRAVITY.y = accY * 0.1
+  },
+  true,
+)
+
 requestAnimationFrame(step)

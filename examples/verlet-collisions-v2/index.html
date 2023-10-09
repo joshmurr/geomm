@@ -11,17 +11,26 @@
         padding: 0;
         overflow: hidden;
       }
+      #device,
       #fps {
         background: white;
-        color: blue;
         position: absolute;
+      }
+      #fps {
         top: 0;
         right: 0;
+        color: blue;
+      }
+      #device {
+        top: 40px;
+        right: 0;
+        color: red;
       }
     </style>
   </head>
   <body>
     <pre id="fps"></pre>
+    <pre id="device"></pre>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>
