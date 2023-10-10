@@ -1,13 +1,13 @@
 /* A re-implementation of the demo: https://www.ibiblio.org/e-notes/webgl/gpu/flat_wave.htm */
 
 import { appendEl } from '@geomm/dom'
+import { indexedQuad } from '@geomm/geometry'
 import {
   basicVert,
   createFramebuffer,
   createTexture,
   initProgram,
   pingPong,
-  quadBuffer,
   webgl2Canvas,
 } from '@geomm/webgl'
 
@@ -104,7 +104,7 @@ const compute1 = {
   ...initProgram(gl, {
     vertShader: basicVert,
     fragShader: programFrag,
-    bufferFn: quadBuffer,
+    bufferGroup: indexedQuad,
   }),
   uniforms: {
     u_samp: textures[0],
@@ -117,7 +117,7 @@ const compute2 = {
   ...initProgram(gl, {
     vertShader: basicVert,
     fragShader: programFrag,
-    bufferFn: quadBuffer,
+    bufferGroup: indexedQuad,
   }),
   uniforms: {
     u_samp: textures[1],
@@ -130,7 +130,7 @@ const compute3 = {
   ...initProgram(gl, {
     vertShader: basicVert,
     fragShader: programFrag,
-    bufferFn: quadBuffer,
+    bufferGroup: indexedQuad,
   }),
   uniforms: {
     u_samp: textures[2],
@@ -144,7 +144,7 @@ const outputProgramDesc = {
   ...initProgram(gl, {
     vertShader: basicVert,
     fragShader: outputFrag,
-    bufferFn: quadBuffer,
+    bufferGroup: indexedQuad,
   }),
   uniforms: {
     u_samp: textures[0],

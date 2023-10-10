@@ -1,11 +1,10 @@
-import { add, canvas } from '@geomm/dom'
+import { appendEl, canvas } from '@geomm/dom'
 import {
   basicVert,
   createFramebuffer,
   createTexture,
   initProgram,
   pingPong,
-  quadBuffer,
   webgl2Canvas,
 } from '@geomm/webgl'
 import {
@@ -14,24 +13,20 @@ import {
   hexToRgb,
   intRgbToFloat,
 } from './colors'
-import {
-  applyKernel,
-  blurKernel,
-  float32ArrayToImage,
-  imageToFloat32Array,
-} from './image'
+import { applyKernel, blurKernel, float32ArrayToImage } from './image'
 import seed from './images/09.png'
-import { sdfCircle, sdfSquare, smoothstep } from './sdf'
+import { sdfSquare, smoothstep } from './sdf'
 import { programFrag, outputFrag } from './shaders'
+import { indexedQuad } from '@geomm/geometry'
 
 const SIZE = 256
 const RES = { width: SIZE, height: SIZE }
 const SCREEN = { width: SIZE, height: SIZE }
 const [c, gl] = webgl2Canvas(SCREEN.width, SCREEN.height)
-add(c)
+appendEl(c)
 
 const tmpCanvas = canvas(SCREEN.width, SCREEN.height)
-add(tmpCanvas)
+appendEl(tmpCanvas)
 
 const ext = gl.getExtension('EXT_color_buffer_float')
 if (!ext) {
@@ -65,7 +60,7 @@ const generateSeedImage = (
   return { pix }
 }
 
-const seedImage = add('img') as HTMLImageElement
+const seedImage = appendEl('img') as HTMLImageElement
 seedImage.src = seed
 
 seedImage.onload = () => {
@@ -104,7 +99,7 @@ seedImage.onload = () => {
     ...initProgram(gl, {
       vertShader: basicVert,
       fragShader: programFrag,
-      bufferFn: quadBuffer,
+      bufferGroup: indexedQuad,
     }),
     uniforms: {
       u_samp: textures[0],
@@ -117,7 +112,7 @@ seedImage.onload = () => {
     ...initProgram(gl, {
       vertShader: basicVert,
       fragShader: programFrag,
-      bufferFn: quadBuffer,
+      bufferGroup: indexedQuad,
     }),
     uniforms: {
       u_samp: textures[1],
@@ -130,7 +125,7 @@ seedImage.onload = () => {
     ...initProgram(gl, {
       vertShader: basicVert,
       fragShader: programFrag,
-      bufferFn: quadBuffer,
+      bufferGroup: indexedQuad,
     }),
     uniforms: {
       u_samp: textures[2],
@@ -144,7 +139,7 @@ seedImage.onload = () => {
     ...initProgram(gl, {
       vertShader: basicVert,
       fragShader: outputFrag,
-      bufferFn: quadBuffer,
+      bufferGroup: indexedQuad,
     }),
     uniforms: {
       u_samp: textures[0],
