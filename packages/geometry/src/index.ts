@@ -1,6 +1,4 @@
 export * from './rawBuffers'
-export * from './vec'
-export * from './vec3'
 export * from './api'
 export * from './routines'
 export * from './vertexIds'

@@ -1,4 +1,4 @@
-import { Vec } from '@geomm/api'
+import { Vec2 } from '@geomm/api'
 
 export const fixedGrid = (width: number, height: number, cellSize: number) => {
   const cols = Math.floor(width / cellSize)
@@ -9,7 +9,7 @@ export const fixedGrid = (width: number, height: number, cellSize: number) => {
     const row = Math.floor(y / cellSize)
     return cells[row * cols + col]
   }
-  const add = (p: Vec, index: number) => {
+  const add = (p: Vec2, index: number) => {
     const { x, y } = p
     const cell = getCell(x, y)
     if (!cell) return
@@ -18,7 +18,7 @@ export const fixedGrid = (width: number, height: number, cellSize: number) => {
   const clear = () => {
     cells = Array.from({ length: cols * rows }, () => [] as number[])
   }
-  const neighbours = (p: Vec, radius: number) => {
+  const neighbours = (p: Vec2, radius: number) => {
     const { x, y } = p
     const col = Math.floor(x / cellSize)
     const row = Math.floor(y / cellSize)

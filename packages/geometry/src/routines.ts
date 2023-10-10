@@ -1,5 +1,5 @@
 import { MeshBufferGroup } from '@geomm/api'
-import { cross3, normalize3, sub3, vec3 } from './vec3'
+import { cross3, normalize3, sub3, vec3 } from '@geomm/maths'
 
 export const computeFaceNormals = ({ buffers, indices }: MeshBufferGroup) => {
   if (!indices) {

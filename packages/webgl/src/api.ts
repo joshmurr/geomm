@@ -1,4 +1,4 @@
-import type { MeshBufferGroup, StringMap, Vec } from '@geomm/api'
+import type { MeshBufferGroup, StringMap, Vec2 } from '@geomm/api'
 
 export type WGL2RC = WebGL2RenderingContext
 
@@ -30,7 +30,7 @@ export type Setters = StringMap<(val: unknown) => void>
 export type Viewport =
   | [number, number, number, number]
   | [number, number]
-  | Vec
+  | Vec2
   | null
   | undefined
 

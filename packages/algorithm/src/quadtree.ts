@@ -1,18 +1,19 @@
-import { vec, Vec } from '@geomm/geometry'
+import type { Vec2 } from '@geomm/api'
+import { vec2 } from '@geomm/maths'
 
 export type AABB = {
-  center: Vec
+  center: Vec2
   half: number
 }
 
 export type Quadtree = {
   bounds: AABB
-  nodes: Quadtree[] | Vec | undefined
+  nodes: Quadtree[] | Vec2 | undefined
 }
 
-export const aabb = (center: Vec, half: number) => ({ center, half })
+export const aabb = (center: Vec2, half: number) => ({ center, half })
 
-const contains = (rect: AABB, p: Vec) => {
+const contains = (rect: AABB, p: Vec2) => {
   const { center, half } = rect
   const { x, y } = p
   return (
@@ -28,10 +29,10 @@ export const subdivide = (rect: AABB) => {
   const { x, y } = center
   const h = half / 2
   return [
-    aabb(vec(x - h, y - h), h),
-    aabb(vec(x + h, y - h), h),
-    aabb(vec(x - h, y + h), h),
-    aabb(vec(x + h, y + h), h),
+    aabb(vec2(x - h, y - h), h),
+    aabb(vec2(x + h, y - h), h),
+    aabb(vec2(x - h, y + h), h),
+    aabb(vec2(x + h, y + h), h),
   ]
 }
 
@@ -42,7 +43,7 @@ export const quadtree = (bounds: AABB) => {
   }
 }
 
-export const insert = (tree: Quadtree, p: Vec, d = 0) => {
+export const insert = (tree: Quadtree, p: Vec2, d = 0) => {
   if (d > 4) {
     // Max depth
     return tree
@@ -80,7 +81,7 @@ export const insert = (tree: Quadtree, p: Vec, d = 0) => {
   return undefined
 }
 
-export const query = (tree: Quadtree, bounds: AABB): Vec[] => {
+export const query = (tree: Quadtree, bounds: AABB): Vec2[] => {
   const { center, half } = bounds
   const { x, y } = center
   const { bounds: treeBounds, nodes } = tree
