@@ -1,6 +1,6 @@
 {
   "name": "@geomm/algorithm",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -12,8 +12,8 @@
     "build": "tsc --declaration"
   },
   "dependencies": {
-    "@geomm/api": "^1.0.0",
-    "@geomm/geometry": "^1.0.2",
-    "@geomm/maths": "^1.0.2"
+    "@geomm/api": "*",
+    "@geomm/geometry": "*",
+    "@geomm/maths": "*"
   }
 }

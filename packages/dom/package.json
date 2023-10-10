@@ -1,6 +1,6 @@
 {
   "name": "@geomm/dom",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -27,7 +27,7 @@
   "author": "Josh Murr",
   "license": "ISC",
   "dependencies": {
-    "@geomm/api": "^1.0.0",
-    "@geomm/maths": "^1.0.0"
+    "@geomm/api": "*",
+    "@geomm/maths": "*"
   }
 }

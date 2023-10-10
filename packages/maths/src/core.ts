@@ -6,6 +6,7 @@ export const LOG2E = Math.LOG2E
 export const PI = Math.PI
 export const SQRT1_2 = Math.SQRT1_2
 export const SQRT2 = Math.SQRT2
+export const PHI = (1 + Math.sqrt(5)) / 2
 export const abs = Math.abs
 export const acos = Math.acos
 export const acosh = Math.acosh

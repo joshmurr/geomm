@@ -1,6 +1,6 @@
 {
   "name": "@geomm/geometry",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -22,11 +22,13 @@
     "./buffers": {
       "default": "./lib/rawBufffers.js"
     },
-    "./dom": {
+    "./utils": {
       "default": "./lib/utils.js"
     }
   },
   "dependencies": {
-    "@geomm/api": "^1.0.0"
+    "@geomm/api": "*",
+    "@geomm/maths": "*",
+    "@geomm/webgl": "*"
   }
 }

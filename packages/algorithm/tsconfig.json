@@ -1,8 +1,20 @@
-  {
-    "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-      "rootDir": "src",
-      "outDir": "lib"
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./src/quadtree.ts"],
+  "references": [
+    {
+      "path": "../api"
     },
-    "include": ["./src/**/*"]
-  }
+    {
+      "path": "../geometry"
+    },
+    {
+      "path": "../maths"
+    }
+  ]
+}

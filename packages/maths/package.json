@@ -1,6 +1,6 @@
 {
   "name": "@geomm/maths",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -33,7 +33,7 @@
     }
   },
   "dependencies": {
-    "@geomm/api": "^1.0.0",
+    "@geomm/api": "*",
     "gl-matrix": "^3.4.3"
   }
 }
