@@ -23,7 +23,8 @@ install_package() {
       "rootDir": "src",
       "outDir": "lib"
     },
-    "include": ["./src/**/*"]
+    "include": ["src"],
+    "include": ["lib"]
   }
 EOF
 
