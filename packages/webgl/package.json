@@ -51,7 +51,6 @@
     "@geomm/api": "*",
     "@geomm/core": "*",
     "@geomm/dom": "*",
-    "@geomm/geometry": "*",
     "@geomm/maths": "*"
   }
 }

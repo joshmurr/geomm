@@ -1,4 +1,4 @@
-import { Vec3 } from './api'
+import { Vec3 } from '@geomm/api'
 
 export const vec3 = (x: number, y: number, z: number) => ({ x, y, z })
 

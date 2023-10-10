@@ -1,5 +1,4 @@
-import type { StringMap, TypedArray } from '@geomm/api'
-import type { Vec } from '@geomm/geometry'
+import type { MeshBufferGroup, StringMap, Vec } from '@geomm/api'
 
 export type WGL2RC = WebGL2RenderingContext
 
@@ -27,48 +26,6 @@ export interface Setter {
 }
 
 export type Setters = StringMap<(val: unknown) => void>
-
-export interface AttributeInfo {
-  name: string
-  numComponents: number
-  stride?: number
-  offset?: number
-  type?: GLenum
-}
-
-export interface AttributeInfoComputed extends AttributeInfo {
-  location: number
-  stride: number
-  offset: number
-  type: GLenum
-}
-
-export interface BufferInfo {
-  data?: TypedArray | null
-  buffer?: WebGLBuffer
-  target?: GLenum
-  usage?: GLenum
-  type?: GLenum
-  attributes: AttributeInfo[]
-}
-
-export interface BufferData {
-  buffer: WebGLBuffer
-  target: GLenum
-  usage: GLenum
-  data: TypedArray | null
-}
-
-export interface BufferInfoComputed extends BufferData {
-  type: GLenum
-  attributes: AttributeInfoComputed[]
-  indices?: TypedArray
-}
-
-export interface MeshBufferGroup {
-  buffers: BufferInfo[]
-  indices?: TypedArray
-}
 
 export type Viewport =
   | [number, number, number, number]

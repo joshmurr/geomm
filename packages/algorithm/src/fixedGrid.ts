@@ -1,4 +1,4 @@
-import type { Vec } from '@geomm/geometry'
+import { Vec } from '@geomm/api'
 
 export const fixedGrid = (width: number, height: number, cellSize: number) => {
   const cols = Math.floor(width / cellSize)

@@ -1,4 +1,4 @@
-import { MeshBufferGroup } from '@geomm/webgl'
+import { MeshBufferGroup } from '@geomm/api'
 import { cross3, normalize3, sub3, vec3 } from './vec3'
 
 export const computeFaceNormals = ({ buffers, indices }: MeshBufferGroup) => {

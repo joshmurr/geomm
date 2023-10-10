@@ -1,11 +1,12 @@
 import type { TypedArray } from '@geomm/api'
+import type { WGL2RC } from './api'
+
 import type {
   AttributeInfoComputed,
   BufferData,
   BufferInfo,
   BufferInfoComputed,
-  WGL2RC,
-} from './api'
+} from '@geomm/api'
 
 export const bindBuffer = (
   gl: WebGL2RenderingContext,
