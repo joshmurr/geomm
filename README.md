@@ -22,3 +22,4 @@ Monorepos are a nightmare it turns out. I think it's mainly getting Typescript a
 
 1. Add `"composite": true` to `/tsconfig.base.json`. This allows for [Project Referencing](https://www.typescriptlang.org/docs/handbook/project-references.html) to help import resolution.
 2. With that in mind you can (and should) now add the reference to the project `tsconfig` wherever imports are made: `"references": [{ "path": "../maths" }]`. This is a bit annoying as it's not automatic like when you `npm i` something.. but it helps.
+3. Keep an eye on `node_modules` - internal packages should by symlinked, but sometimes it's easy to mess up an "installation" and it will add a new `node_modules` folder, pinned to a version, which can cause `Module XXX has no named export YYY` kinda errors. Deleting the unecessary `node_modules` folder can fix this.
