@@ -15,6 +15,6 @@ export const concat: Reducer<any> = (acc, val) => {
   return acc.concat(val)
 }
 
-export const partial = <T>(fn: (a: T) => T, ...args: T[]) => {
+export const partial = (fn: (...a: any[]) => any, ...args: any[]) => {
   return fn.bind(null, ...args)
 }

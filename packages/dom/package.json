@@ -28,6 +28,8 @@
   "license": "ISC",
   "dependencies": {
     "@geomm/api": "*",
-    "@geomm/maths": "*"
+    "@geomm/maths": "*",
+    "@geomm/core": "*",
+    "gl-matrix": "^3.4.3"
   }
 }
