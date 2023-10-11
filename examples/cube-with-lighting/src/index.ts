@@ -58,8 +58,7 @@ void main(){
 }`
 
 const shape = icosahedron
-
-const normals = computeFaceNormals(shape)
+computeFaceNormals(shape)
 
 const [c, gl] = webgl2Canvas(512, 512)
 appendEl(c)
