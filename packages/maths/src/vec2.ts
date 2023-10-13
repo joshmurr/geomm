@@ -19,9 +19,12 @@ export const dot = (a: Vec2, b: Vec2) => a.x * b.x + a.y * b.y
 export const cross = (a: Vec2, b: Vec2) => a.x * b.y - a.y * b.x
 
 export const normalize = (a: Vec2) => {
-  const len = Math.sqrt(dot(a, a))
+  const EPSILON = 1e-6
+  const len = Math.max(EPSILON, Math.sqrt(dot(a, a)))
   return vec2(a.x / len, a.y / len)
 }
+
+export const rad = (a: Vec2) => Math.atan2(a.y, a.x)
 
 export const mag = (a: Vec2) => Math.sqrt(dot(a, a))
 
