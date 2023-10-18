@@ -1,11 +1,15 @@
 import { Vec2 } from '@geomm/api'
-import { EPSILON, solveQuadratic2d } from '@geomm/maths'
-
-export type CollisionResult = {
-  pos: Vec2
-  t1: number
-  normal: Vec2
-}
+import {
+  EPSILON,
+  add,
+  cross,
+  dot,
+  scale,
+  solveQuadratic2d,
+  sub,
+} from '@geomm/maths'
+import { CollisionResult, PhysicsObject2D } from './api'
+import { updateObject } from './physicsObject2d'
 
 /**
  * Test if point P moving from p1 to p2 collides with segment (l1, l2) moving
@@ -81,4 +85,115 @@ export const testPointLine = (
     }
   }
   return result
+}
+
+/**
+ * Extrapolate testPointLine() to find the earliest collision point (if any) between
+ * two polygons, polyA (moving from polyA0 to polyA1) and polyB (moving from polyB0 to
+ * polyB1).
+ */
+export const testPolyPoly = (
+  polyA0: Vec2[],
+  polyA1: Vec2[],
+  polyB0: Vec2[],
+  polyB1: Vec2[],
+) => {
+  let collisionResult: CollisionResult | null = null
+  for (let i = 0; i < polyA0.length; i++) {
+    const p0 = polyA0[i]
+    const p1 = polyA1[i]
+    for (let j = 0; j < polyB0.length; j++) {
+      const l0 = polyB0[j]
+      const l1 = polyB0[(j + 1) % polyB0.length]
+      const l2 = polyB1[j]
+      const l3 = polyB1[(j + 1) % polyB1.length]
+      const candidate = testPointLine(p0, p1, l0, l1, l2, l3)
+      if (candidate === null) {
+        continue
+      }
+      if (collisionResult === null || candidate.t1 < collisionResult.t1) {
+        collisionResult = candidate
+      }
+    }
+  }
+  return collisionResult
+}
+
+/**
+ * Test collision with other Poly, return null if no collision or
+ * return a PhysicsResult containing the delta linear/angular velocities
+ * to apply to the objects following the collision. The delta parameter
+ * is the time that passed this frame.
+ *
+ * This updated version uses my own formula for conserving kinetic energy
+ * to calculate an impulse.
+ */
+export const impulseResolution = (
+  objA: PhysicsObject2D,
+  objB: PhysicsObject2D,
+  coefficientOfRestitution = 0.5,
+) => {
+  const collisionResult = testPolyPoly(
+    objA.prevVerts,
+    objA.currVerts,
+    objB.prevVerts,
+    objB.currVerts,
+  )
+  if (collisionResult === null) {
+    return { J: null, collisionResult: null }
+  }
+
+  const nB = collisionResult.normal
+  const IA = objA.momentOfInertia
+  const IB = objB.momentOfInertia
+  const mA = objA.mass
+  const mB = objB.mass
+  const rA = sub(collisionResult.pos, objA.pos)
+  const rB = sub(collisionResult.pos, objB.pos)
+  const vA = objA.vel
+  const vB = objB.vel
+  const omegaA = objA.rotationSpeed
+  const omegaB = objB.rotationSpeed
+
+  const C = coefficientOfRestitution
+  const j =
+    ((-1 - C) *
+      (dot(vA, nB) -
+        dot(vB, nB) +
+        omegaA * cross(rA, nB) -
+        omegaB * cross(rB, nB))) /
+    (1 / mA +
+      1 / mB +
+      Math.pow(cross(rA, nB), 2) / IA +
+      Math.pow(cross(rB, nB), 2) / IB)
+  if (j < 0) {
+    return { J: null, collisionResult }
+  }
+  const J = scale(nB, j)
+
+  return { J, collisionResult }
+}
+
+export const applyImpulse = (
+  objA: PhysicsObject2D,
+  objB: PhysicsObject2D,
+  J: Vec2,
+  collisionResult: CollisionResult,
+  delta: number,
+) => {
+  const mA = objA.mass
+  const mB = objB.mass
+  const IA = objA.momentOfInertia
+  const IB = objB.momentOfInertia
+  const rA = sub(collisionResult.pos, objA.pos)
+  const rB = sub(collisionResult.pos, objB.pos)
+
+  updateObject(objA, -delta * collisionResult.t1)
+  updateObject(objB, -delta * collisionResult.t1)
+
+  objA.vel = add(objA.vel, scale(J, 1 / mA))
+  objA.rotationSpeed += cross(rA, J) / IA
+
+  objB.vel = sub(objB.vel, scale(J, 1 / mB))
+  objB.rotationSpeed -= cross(rB, J) / IB
 }

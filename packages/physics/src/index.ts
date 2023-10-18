@@ -1,1 +1,5 @@
+export * from './api'
 export * from './collisions'
+export * from './inertia'
+export * from './physicsObject2d'
+export * from './verlet'

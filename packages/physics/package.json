@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "@geomm/api": "*",
+    "@geomm/geometry": "*",
     "@geomm/maths": "*"
   }
 }

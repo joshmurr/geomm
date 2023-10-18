@@ -36,6 +36,9 @@ export const distanceSq = (a: Vec2, b: Vec2) => {
 
 export const distance = (a: Vec2, b: Vec2) => Math.sqrt(distanceSq(a, b))
 
+export const centroid = (a: Vec2, b: Vec2, c: Vec2) =>
+  vec2((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3)
+
 export const lerp = (a: Vec2, b: Vec2, t: number) => {
   const dx = b.x - a.x
   const dy = b.y - a.y

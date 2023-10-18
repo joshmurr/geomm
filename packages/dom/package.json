@@ -30,6 +30,7 @@
     "@geomm/api": "*",
     "@geomm/maths": "*",
     "@geomm/core": "*",
+    "@geomm/physics": "*",
     "gl-matrix": "^3.4.3"
   }
 }

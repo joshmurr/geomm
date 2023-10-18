@@ -1,10 +1,5 @@
-import type { Vec2 } from '@geomm/api'
+import type { AABB, Vec2 } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
-
-export type AABB = {
-  center: Vec2
-  half: number
-}
 
 export type Quadtree = {
   bounds: AABB
