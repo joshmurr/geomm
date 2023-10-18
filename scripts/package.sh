@@ -24,7 +24,10 @@ install_package() {
       "outDir": "lib"
     },
     "include": ["src"],
-    "include": ["lib"]
+    "exclude": ["lib"],
+    "references": [
+      { "path": "../api" }
+    ]
   }
 EOF
 
@@ -42,8 +45,17 @@ EOF
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+  },
   "dependencies": {
-    "@geomm/api": "^1.0.0"
+    "@geomm/api": "*"
   }
 }
 EOF
