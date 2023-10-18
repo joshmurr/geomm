@@ -1,5 +1,5 @@
 {
-  "name": "@geomm/color",
+  "name": "@geomm/physics",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -11,7 +11,12 @@
   "scripts": {
     "build": "tsc --declaration"
   },
+  "files": [
+    "./lib/*.js",
+    "./lib/*.d.ts"
+  ],
   "dependencies": {
-    "@geomm/api": "*"
+    "@geomm/api": "*",
+    "@geomm/maths": "*"
   }
 }
