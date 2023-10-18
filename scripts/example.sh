@@ -45,7 +45,7 @@ EOF
 		"vite": "^4.3.9"
 	},
 	"dependencies": {
-		"@geomm/api": "^1.0.0"
+		"@geomm/api": "*"
 	},
 	"browser": {
 		"process": false
