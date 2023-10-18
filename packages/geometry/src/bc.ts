@@ -2,7 +2,7 @@
 
 import { Vec2 } from '@geomm/api'
 import { add, distance, scale, vec2 } from '@geomm/maths'
-import { PhysicsObject2D } from '../../physics/lib'
+import { PhysicsObject2D } from '@geomm/physics'
 
 export const boundingCircle = (verts: Vec2[]) => {
   const sum = verts.reduce((acc, v) => add(acc, v), vec2(0, 0))

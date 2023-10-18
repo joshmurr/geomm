@@ -2,10 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "declarationDir": "lib/types"
   },
-  "include": ["./src/**/*"],
-  "exclude": ["./src/quadtree.ts"],
+  "include": ["src"],
+  "exclude": ["lib", "src/quadtree.ts"],
   "references": [
     {
       "path": "../api"

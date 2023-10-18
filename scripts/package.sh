@@ -21,13 +21,11 @@ install_package() {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
       "rootDir": "src",
-      "outDir": "lib"
+      "outDir": "lib",
+      "declarationDir": "lib/types"
     },
     "include": ["src"],
-    "exclude": ["lib"],
-    "references": [
-      { "path": "../api" }
-    ]
+    "exclude": ["lib"]
   }
 EOF
 
@@ -38,16 +36,16 @@ EOF
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
-  "typings": "./lib/index.d.ts",
+  "typings": "./lib/types/index.d.ts",
   "keywords": [],
   "author": "Josh Murr",
   "license": "ISC",
   "scripts": {
-    "build": "tsc --declaration"
+    "build": "tsc"
   },
   "files": [
-    "./lib/*.js",
-    "./lib/*.d.ts"
+    "./lib/**/*.js",
+    "./lib/**/*.d.ts"
   ],
   "exports": {
     ".": {

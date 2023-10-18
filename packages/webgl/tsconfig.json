@@ -2,22 +2,9 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "declarationDir": "lib/types"
   },
   "include": ["src"],
-  "exclude": ["lib"],
-  "references": [
-    {
-      "path": "../api"
-    },
-    {
-      "path": "../core"
-    },
-    {
-      "path": "../dom"
-    },
-    {
-      "path": "../maths"
-    }
-  ]
+  "exclude": ["lib"]
 }

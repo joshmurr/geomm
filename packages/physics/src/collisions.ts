@@ -197,3 +197,18 @@ export const applyImpulse = (
   objB.vel = sub(objB.vel, scale(J, 1 / mB))
   objB.rotationSpeed -= cross(rB, J) / IB
 }
+
+export const collideWithImpulse = (
+  objA: PhysicsObject2D,
+  objB: PhysicsObject2D,
+  delta: number,
+) => {
+  const { J: J1, collisionResult: cr1 } = impulseResolution(objA, objB, 1)
+  if (J1) {
+    applyImpulse(objA, objB, J1, cr1, delta)
+  }
+  const { J: J2, collisionResult: cr2 } = impulseResolution(objB, objA, 1)
+  if (J2) {
+    applyImpulse(objB, objA, J2, cr2, delta)
+  }
+}

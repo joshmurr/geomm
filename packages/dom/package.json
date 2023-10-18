@@ -4,9 +4,10 @@
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
-  "typings": "./lib/index.d.ts",
+  "typings": "./lib/types/index.d.ts",
   "scripts": {
-    "build": "tsc --declaration"
+    "build": "tsc",
+    "clean": "rm -rf ./lib ./tsconfig.tsbuildinfo"
   },
   "files": [
     "./lib/**/*.js",
