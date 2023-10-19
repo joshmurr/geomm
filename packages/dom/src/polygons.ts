@@ -1,6 +1,5 @@
-import { Polygon } from '@geomm/api'
+import type { Polygon, PhysicsObject2D } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
-import type { PhysicsObject2D } from '@geomm/physics'
 
 export const drawPolygon = (
   ctx: CanvasRenderingContext2D,

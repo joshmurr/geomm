@@ -3,14 +3,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "declarationDir": "lib/types",
-    "typeRoots": ["./lib/types"]
+    "declarationDir": "lib/types"
   },
   "include": ["src"],
-  "exclude": ["lib"],
-  "references": [
-    {
-      "path": "../api"
-    }
-  ]
+  "exclude": ["lib"]
 }

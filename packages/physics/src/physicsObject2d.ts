@@ -1,4 +1,5 @@
-import { PhysicsObject2D, RigidBodyBase2D } from './api'
+import type { PhysicsObject2D } from '@geomm/api'
+import type { RigidBodyBase2D, SoftBodyBase2D } from './api'
 import { momentOfInertiaOfPolygon } from './inertia'
 import { areaOfPolygon, boundingBox } from '@geomm/geometry'
 
@@ -28,6 +29,15 @@ export const createRigidBody2D = ({
     currVerts: [],
   }
   updateObject(obj, 0)
+  return obj
+}
+
+export const createSoftBody2D = ({ pos, vel, verts }: SoftBodyBase2D) => {
+  const obj = {
+    pos,
+    verts,
+    vel,
+  }
   return obj
 }
 

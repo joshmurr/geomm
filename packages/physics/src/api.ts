@@ -1,9 +1,10 @@
-import { AABB, BC, Polygon, Vec2 } from '@geomm/api'
+import { AABB, BC, Vec2 } from '@geomm/api'
 
 export type CollisionResult = {
   pos: Vec2
   t1: number
   normal: Vec2
+  vert?: Vec2
 }
 
 export type RigidBodyBase2D = {
@@ -17,18 +18,10 @@ export type RigidBodyBase2D = {
   bc?: BC
 }
 
-export type PhysicsObject2D = Polygon & {
-  vel: Vec2
-  aabb: AABB
-  bc: BC
+export type SoftBodyBase2D = {
   pos: Vec2
-  rotation: number
-  rotationSpeed: number
-  mass: number
-  momentOfInertia: number
-  prevVerts: Vec2[]
-  currVerts: Vec2[]
-  density: number
+  vel: Vec2
+  verts: VerletPoint[]
 }
 
 export type VerletPoint = {
@@ -43,4 +36,9 @@ export type VerletConnection = {
   ids: [number, number]
   len: number
   strength: number
+}
+
+export type SoftBody = {
+  verts: VerletPoint[]
+  connections: VerletConnection[]
 }

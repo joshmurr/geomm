@@ -6,16 +6,5 @@
     "declarationDir": "lib/types"
   },
   "include": ["src"],
-  "exclude": ["lib", "src/quadtree.ts"],
-  "references": [
-    {
-      "path": "../api"
-    },
-    {
-      "path": "../geometry"
-    },
-    {
-      "path": "../maths"
-    }
-  ]
+  "exclude": ["lib", "src/quadtree.ts"]
 }

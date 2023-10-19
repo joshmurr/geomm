@@ -8,7 +8,8 @@ import {
   solveQuadratic2d,
   sub,
 } from '@geomm/maths'
-import { CollisionResult, PhysicsObject2D } from './api'
+import type { PhysicsObject2D } from '@geomm/api'
+import type { CollisionResult, SoftBody } from './api'
 import { updateObject } from './physicsObject2d'
 
 /**
@@ -80,6 +81,7 @@ export const testPointLine = (
           pos: intersection,
           t1: t1,
           normal: normal,
+          vert: p1,
         }
       }
     }
@@ -91,6 +93,12 @@ export const testPointLine = (
  * Extrapolate testPointLine() to find the earliest collision point (if any) between
  * two polygons, polyA (moving from polyA0 to polyA1) and polyB (moving from polyB0 to
  * polyB1).
+ *
+ * polyA and polB are two sets of vertices.
+ *
+ * polyA is treated as individual vertices, where each vertex is moving from p0 to p1.
+ *
+ * polyB is treated as lines where l0l1 is moving from l2l3.
  */
 export const testPolyPoly = (
   polyA0: Vec2[],
@@ -107,6 +115,28 @@ export const testPolyPoly = (
       const l1 = polyB0[(j + 1) % polyB0.length]
       const l2 = polyB1[j]
       const l3 = polyB1[(j + 1) % polyB1.length]
+      const candidate = testPointLine(p0, p1, l0, l1, l2, l3)
+      if (candidate === null) {
+        continue
+      }
+      if (collisionResult === null || candidate.t1 < collisionResult.t1) {
+        collisionResult = candidate
+      }
+    }
+  }
+  return collisionResult
+}
+
+export const testSoftBodies = (bodyA: SoftBody, bodyB: SoftBody) => {
+  let collisionResult: CollisionResult | null = null
+  for (let i = 0; i < bodyA.verts.length; i++) {
+    const p0 = bodyA.verts[i].pos
+    const p1 = bodyA.verts[i].prevPos
+    for (let j = 0; j < bodyB.verts.length; j++) {
+      const l0 = bodyB.verts[j].pos
+      const l1 = bodyB.verts[(j + 1) % bodyB.verts.length].pos
+      const l2 = bodyB.verts[j].prevPos
+      const l3 = bodyB.verts[(j + 1) % bodyB.verts.length].prevPos
       const candidate = testPointLine(p0, p1, l0, l1, l2, l3)
       if (candidate === null) {
         continue
