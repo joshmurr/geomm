@@ -8,6 +8,8 @@ export const add3 = (a: Vec3, b: Vec3) => vec3(a.x + b.x, a.y + b.y, a.z + b.z)
 
 export const mul3 = (a: Vec3, b: Vec3) => vec3(a.x * b.x, a.y * b.y, a.z * b.z)
 
+export const scale3 = (a: Vec3, s: number) => vec3(a.x * s, a.y * s, a.z * s)
+
 export const div3 = (a: Vec3, b: Vec3) => vec3(a.x / b.x, a.y / b.y, a.z / b.z)
 
 export const dot3 = (a: Vec3, b: Vec3) => a.x * b.x + a.y * b.y + a.z * b.z

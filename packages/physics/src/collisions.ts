@@ -81,7 +81,6 @@ export const testPointLine = (
           pos: intersection,
           t1: t1,
           normal: normal,
-          vert: p1,
         }
       }
     }
@@ -128,7 +127,7 @@ export const testPolyPoly = (
 }
 
 export const testSoftBodies = (bodyA: SoftBody, bodyB: SoftBody) => {
-  let collisionResult: CollisionResult | null = null
+  let collisionResult: (CollisionResult & { index: number }) | null = null
   for (let i = 0; i < bodyA.verts.length; i++) {
     const p0 = bodyA.verts[i].pos
     const p1 = bodyA.verts[i].prevPos
@@ -142,7 +141,7 @@ export const testSoftBodies = (bodyA: SoftBody, bodyB: SoftBody) => {
         continue
       }
       if (collisionResult === null || candidate.t1 < collisionResult.t1) {
-        collisionResult = candidate
+        collisionResult = { ...candidate, index: i }
       }
     }
   }

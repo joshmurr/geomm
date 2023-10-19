@@ -4,6 +4,9 @@ export const LN2 = Math.LN2
 export const LOG10E = Math.LOG10E
 export const LOG2E = Math.LOG2E
 export const PI = Math.PI
+export const HALF_PI = Math.PI / 2
+export const QUARTER_PI = Math.PI / 4
+export const TWO_PI = Math.PI * 2
 export const SQRT1_2 = Math.SQRT1_2
 export const SQRT2 = Math.SQRT2
 export const PHI = (1 + Math.sqrt(5)) / 2
@@ -43,3 +46,4 @@ export const sqrt = Math.sqrt
 export const tan = Math.tan
 export const tanh = Math.tanh
 export const trunc = Math.trunc
+export const radians = (degrees: number) => (degrees * PI) / 180

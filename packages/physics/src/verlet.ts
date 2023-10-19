@@ -94,6 +94,7 @@ export const pointCollide = (
   }
 }
 
+/* Not very useful */
 export const lineCollide = (
   p: VerletPoint,
   collisionResult: CollisionResult,

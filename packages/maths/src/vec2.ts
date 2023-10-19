@@ -56,3 +56,11 @@ export const limit = (v: Vec2, max: number) => {
   }
   return v
 }
+
+export const rotate = (v: Vec2, angle: number) => {
+  const c = Math.cos(angle)
+  const s = Math.sin(angle)
+  return vec2(v.x * c - v.y * s, v.x * s + v.y * c)
+}
+
+export const copy = (v: Vec2) => vec2(v.x, v.y)
