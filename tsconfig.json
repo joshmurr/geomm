@@ -8,7 +8,7 @@
     { "path": "packages/maths" },
     { "path": "packages/algorithm" },
     { "path": "packages/color" },
-    { "path": "packages/physics" },
-    { "path": "packages/webgl" }
+    { "path": "packages/webgl" },
+    { "path": "packages/physics" }
   ]
 }

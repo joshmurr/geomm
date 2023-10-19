@@ -20,7 +20,15 @@
   "license": "ISC",
   "packageManager": "npm@9.8.1",
   "workspaces": [
-    "packages/*"
+    "packages/api",
+    "packages/core",
+    "packages/maths",
+    "packages/color",
+    "packages/dom",
+    "packages/algorithm",
+    "packages/geometry",
+    "packages/webgl",
+    "packages/physics"
   ],
   "devDependencies": {
     "@types/react": "^18.2.15",
