@@ -1,6 +1,6 @@
 {
   "name": "@geomm/geometry",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -13,8 +13,8 @@
     "clean": "rm -rf ./lib ./tsconfig.tsbuildinfo"
   },
   "files": [
-    "./lib/*.js",
-    "./lib/types/*.d.ts"
+    "./lib/**/*.js",
+    "./lib/types/**/*.d.ts"
   ],
   "exports": {
     ".": {
