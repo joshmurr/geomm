@@ -6,9 +6,8 @@
 
 import { Reducer } from './api'
 
-export const mapping = <T>(f: (x: T) => T) => {
-  return function (rf: Reducer<T>) {
-    // this takes 2 things and makes them 1
+export const mapping = <T>(f: (x: T) => any) => {
+  return function(rf: Reducer<T>) {
     return (acc: T, val: T) => {
       return rf(acc, f(val)) // <-- rf replaces 'concat'
     }
@@ -17,7 +16,7 @@ export const mapping = <T>(f: (x: T) => T) => {
 
 // generalize the 'filtering' concept, without the concat...
 export const filtering = <T>(p: (x: T) => boolean) => {
-  return function (rf: Reducer<T>) {
+  return function(rf: Reducer<T>) {
     return (acc: T, val: T) => {
       return p(val) ? rf(acc, val) : acc // <-- rf replaces 'concat'
     }

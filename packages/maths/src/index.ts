@@ -1,5 +1,6 @@
 export * from './matrices'
 export * from './vectors'
+export * from './arrays'
 export * from './utils'
 export * from './api'
 export * from './core'

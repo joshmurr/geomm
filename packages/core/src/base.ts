@@ -4,12 +4,14 @@ export const apply = <T>(x: T, f: (x: T) => unknown) => {
   return f(x)
 }
 
-export const compose = <T>(fn1: (a: T) => T, ...fns: Array<(a: T) => T>) => {
-  return fns.reduceRight(
-    (prevFn, nextFn) => (value) => prevFn(nextFn(value)),
-    fn1,
-  )
+export const compose = <T>(...fns: Array<(a: T) => T>) => {
+  return (value) => fns.reduceRight((value, nextFn) => nextFn(value), value)
 }
+
+export const compose2 =
+  (...fns) =>
+    (x) =>
+      fns.reduceRight((y, f) => f(y), x)
 
 export const concat: Reducer<any> = (acc, val) => {
   return acc.concat(val)
