@@ -1,8 +1,7 @@
 /* https://dev.to/ndesmic/splines-from-scratch-catmull-rom-3m66 */
 import { Vec2 } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
-
-type CurveFn = (p: Vec2[], t: number) => Vec2
+import { CurveFn } from './api'
 
 export const catmullRomSpline: CurveFn = (points, t) => {
   const i = Math.floor(t)
@@ -76,7 +75,7 @@ export const measureSegments = (segs: Vec2[]) => {
     lengths.push(
       Math.sqrt(
         (currentPoint.x - lastPoint.x) ** 2 +
-        (currentPoint.y - lastPoint.y) ** 2,
+          (currentPoint.y - lastPoint.y) ** 2,
       ),
     )
     lastPoint = currentPoint
