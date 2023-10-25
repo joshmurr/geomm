@@ -1,5 +1,5 @@
-import type { Vec2 } from '@geomm/api'
-import { appendEl, createEl } from '@geomm/dom'
+import type { AABB, Vec2 } from '@geomm/api'
+import { appendEl, createEl, drawSpline } from '@geomm/dom'
 import {
   PI,
   SQRT2,
@@ -24,23 +24,31 @@ import {
   integrateForces,
   resetAttributes,
 } from './softbody'
-import { aabb } from '@geomm/geometry'
+import { aabb, catmullRomSpline } from '@geomm/geometry'
 
 const { innerWidth, innerHeight } = window
 const SIZE = vec2(innerWidth, innerHeight)
-const GRAVITY = vec2(0, 0)
+const GRAVITY = vec2(0, 0.1)
 const BOUNDARY_FRICTION = 0.6 // Damping of momentum on collision with boundary.
 const COLLISON_DAMPING = 0.7 // Damping of momentum on collision with object.
 const COLLISION_FORCE = 400 // Magnitude of force repeling softbody nodes on collision.
 const MOUSE_PULL = 0.001 // Strength of mouse force.
 const DAMP = 0.3 // SOFtbody node damping.
 const STIFF = 0.01 // Softbody spring stiffness.
-const MASS = 1 // SOFTBody node mass.
-const BOUNDS = aabb(vec2(SIZE.x / 2, SIZE.y / 2), SIZE.x / 2, SIZE.y / 2)
+const MASS = 3 // SOFTBody node mass.
 const N_BODIES = 6
 
 let mousePos = vec2(0, 0)
 let mouseDown = false
+
+export type SolidBody = AABB & {
+  internal?: boolean
+}
+
+let bounds: SolidBody = {
+  ...aabb(vec2(SIZE.x / 2, SIZE.y / 2), SIZE.x / 2, SIZE.y / 2),
+  internal: true,
+}
 
 const c = createEl('canvas', {
   width: SIZE.x,
@@ -59,6 +67,7 @@ const createSquare = (
   position: Vec2,
   rotation: number,
   color: string,
+  fixed = false,
 ) => {
   // Create empty array for the nodes.
   const nodes = new Array(node_count)
@@ -102,7 +111,7 @@ const createSquare = (
     }
   }
 
-  return createSoftBody(nodes, color)
+  return createSoftBody(nodes, color, fixed)
 }
 
 const bodies: SoftBody[] = []
@@ -113,13 +122,27 @@ for (let i = 0; i < N_BODIES; i++) {
     STIFF,
     32,
     200,
-    vec2(200, i * 200 + 10),
+    vec2(random() * SIZE.x, random() * SIZE.y),
     random() * TWO_PI,
     `#${floor(random() * 16777215).toString(16)}`,
   )
 
   bodies.push(body)
 }
+
+bodies.push(
+  createSquare(
+    DAMP,
+    MASS,
+    STIFF,
+    64,
+    400,
+    vec2(SIZE.x / 2, SIZE.y / 2),
+    random() * TWO_PI,
+    `#${floor(random() * 16777215).toString(16)}`,
+    true,
+  ),
+)
 
 const drawBody = (
   ctx: CanvasRenderingContext2D,
@@ -132,13 +155,16 @@ const drawBody = (
 ) => {
   ctx.fillStyle = sb.color
   if (fill) {
-    ctx.beginPath()
-    ctx.moveTo(sb.nodes[0].pos.x, sb.nodes[0].pos.y)
-    for (let i = 1; i < sb.nodes.length; i++) {
-      ctx.lineTo(sb.nodes[i].pos.x, sb.nodes[i].pos.y)
-    }
-    ctx.closePath()
-    ctx.fill()
+    drawSpline(
+      ctx,
+      catmullRomSpline,
+      sb.nodes.map((n) => n.pos),
+      {
+        strokeStyle: 'white',
+        resolution: 0.1,
+        close: true,
+      },
+    )
   }
   if (points) {
     for (let i = 0; i < sb.nodes.length; i++) {
@@ -153,7 +179,7 @@ const drawBody = (
     for (let i = 0; i < sb.nodes.length; i++) {
       const { pos } = sb.nodes[i]
       const radius = sb.radii[i]
-      const normal = add(pos, scale(sb.normals[i], radius / 2))
+      const normal = add(pos, scale(sb.normals[i], radius / 4))
       ctx.strokeStyle = '#f00'
       ctx.beginPath()
       ctx.moveTo(pos.x, pos.y)
@@ -176,7 +202,7 @@ const updateBody = (sb: SoftBody, bodies: SoftBody[]) => {
   resetAttributes(sb)
   calculateAttributes(sb)
   calculateSurface(sb)
-  dampUpdateBoundary(sb, BOUNDARY_FRICTION, BOUNDS)
+  if (!sb?.fixed) dampUpdateBoundary(sb, BOUNDARY_FRICTION, [bounds])
 
   for (let i = 0; i < bodies.length; i++) {
     const other = bodies[i]
@@ -185,18 +211,13 @@ const updateBody = (sb: SoftBody, bodies: SoftBody[]) => {
     }
   }
 }
-
-let lastTime = new Date().getTime()
 const step = () => {
-  const nowTime = new Date().getTime()
-  const deltaTime = (nowTime - lastTime) / 1000
-  lastTime = nowTime
   ctx.fillStyle = '#000'
   ctx.fillRect(0, 0, SIZE.x, SIZE.y)
 
   bodies.forEach((body) => {
     updateBody(body, bodies)
-    drawBody(ctx, body, { fill: true, points: false, normals: false })
+    drawBody(ctx, body, { fill: true, points: false, normals: true })
   })
 
   requestAnimationFrame(step)
@@ -222,6 +243,13 @@ window.addEventListener('mousedown', () => {
 
 window.addEventListener('mouseup', () => {
   mouseDown = false
+})
+
+window.addEventListener('resize', () => {
+  const { innerWidth, innerHeight } = window
+  SIZE.x = innerWidth
+  SIZE.y = innerHeight
+  bounds = aabb(vec2(SIZE.x / 2, SIZE.y / 2), SIZE.x / 2, SIZE.y / 2)
 })
 
 requestAnimationFrame(step)

@@ -26,6 +26,7 @@ import {
   vec2,
   vec3,
 } from '@geomm/maths'
+import type { SolidBody } from '.'
 
 export type SoftBody = {
   nodes: Node[]
@@ -38,9 +39,14 @@ export type SoftBody = {
   radii: number[]
   normals: Vec2[]
   averageDistance: number
+  fixed?: boolean
 }
 
-export const createSoftBody = (nodes: Node[], color: string) => {
+export const createSoftBody = (
+  nodes: Node[],
+  color: string,
+  fixed: boolean,
+) => {
   const pos = vec2(0, 0)
   const linearMomentum = vec2(0, 0)
   const angularMomentum = vec3(0, 0, 0)
@@ -60,6 +66,7 @@ export const createSoftBody = (nodes: Node[], color: string) => {
     radii,
     normals,
     averageDistance,
+    fixed,
   }
 }
 
@@ -171,16 +178,50 @@ export const integrateForces = (sb: SoftBody) => {
   }
 }
 
+export const crossingNumber = (
+  node: Node,
+  polygon: Vec2[],
+  normal: Vec2,
+  damping: number,
+  force: number,
+) => {
+  let crossingNumber = 0
+  for (let i = 0; i < polygon.length; i++) {
+    const v = polygon[i]
+    const w = polygon[(i + 1) % polygon.length]
+    const { pos: p } = node
+
+    if ((v.y <= p.y && w.y > p.y) || (v.y > p.y && w.y <= p.y)) {
+      const vt = (p.y - v.y) / (w.y - v.y)
+
+      if (p.x < v.x + vt * (w.x - v.x)) {
+        crossingNumber++
+      }
+    }
+  }
+
+  /* if (crossingNumber % 2 === 1) { */
+  /*   node.momentum = sub(node.momentum, node.globalMomentum) */
+  /*   node.momentum = sub(node.momentum, scale(normal, force * 1)) */
+  /*   node.momentum = scale(node.momentum, 1 - damping) */
+  /*   node.momentum = add(node.momentum, node.globalMomentum) */
+  /* } */
+
+  /* 0 if even (out), and 1 if  odd (in) */
+  return crossingNumber & 1
+}
+
 export const dampUpdateBoundary = (
   sb: SoftBody,
   friction: number,
-  bounds: AABB,
+  bounds: SolidBody[],
 ) => {
   for (let i = 0; i < sb.nodes.length; i++) {
     const currentNode = sb.nodes[i]
     calculateGlobal(currentNode, sb)
     applyDamping(currentNode)
     updateNode(currentNode)
+    /* crossingNumber(currentNode, solidBodies, sb.normals[i], 0.5, 15) */
     boundaryCollide(currentNode, friction, bounds)
   }
 }

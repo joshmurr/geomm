@@ -2,7 +2,6 @@ import type { AABB, Vec2 } from '@geomm/api'
 import {
   add,
   clamp,
-  copy,
   normalize,
   radians,
   rotate,
@@ -11,6 +10,7 @@ import {
   vec2,
 } from '@geomm/maths'
 import { volumeField, type SoftBody } from './softbody'
+import type { SolidBody } from '.'
 
 export type Spring = {
   idx: number
@@ -27,7 +27,9 @@ export type Node = {
   globalMomentum: Vec2
 }
 
-export const createNode = (ops: Node) => {
+export const createNode = (
+  ops: Pick<Node, 'pos' | 'mass' | 'springs' | 'damping'>,
+) => {
   const { pos, mass, springs, damping } = ops
   const momentum = vec2(0, 0)
   const globalMomentum = vec2(0, 0)
@@ -59,28 +61,35 @@ export const updateNode = (node: Node) => {
   node.pos = add(node.pos, node.momentum)
 }
 
-export const boundaryCollide = (node: Node, friction: number, bounds: AABB) => {
-  const { center, halfWidth, halfHeight } = bounds
-  const min = vec2(center.x - halfWidth, center.y - halfHeight)
-  const max = vec2(center.x + halfWidth, center.y + halfHeight)
-  // Check if node is outside bounds of simulation.
-  if (node.pos.x < min.x || node.pos.x > max.x) {
-    // Flip momentum in appropriate direction if it is.
-    node.momentum.x *= -1
-    // Apply boundary friction to momentum.
-    node.momentum = scale(node.momentum, 1 - friction)
-  }
+export const boundaryCollide = (
+  node: Node,
+  friction: number,
+  bounds: SolidBody[],
+) => {
+  bounds.forEach(({ center, halfWidth, halfHeight, internal }) => {
+    const min = vec2(center.x - halfWidth, center.y - halfHeight)
+    const max = vec2(center.x + halfWidth, center.y + halfHeight)
+    if (internal) {
+      // Check if node is outside bounds of simulation.
+      if (node.pos.x < min.x || node.pos.x > max.x) {
+        // Flip momentum in appropriate direction if it is.
+        node.momentum.x *= -1
+        // Apply boundary friction to momentum.
+        node.momentum = scale(node.momentum, 1 - friction)
+      }
 
-  // Repeat for horizontal walls of boundary.
-  if (node.pos.y < min.y || node.pos.y > max.y) {
-    node.momentum.y *= -1
-    node.momentum = scale(node.momentum, 1 - friction)
-  }
+      // Repeat for horizontal walls of boundary.
+      if (node.pos.y < min.y || node.pos.y > max.y) {
+        node.momentum.y *= -1
+        node.momentum = scale(node.momentum, 1 - friction)
+      }
 
-  /* In addition to flipping momentum and applying friction,
-  constrain pos to within bounds of simulation to prevent clipping errors. */
-  node.pos.x = clamp(node.pos.x, min.x, max.x)
-  node.pos.y = clamp(node.pos.y, min.y, max.y)
+      /* In addition to flipping momentum and applying friction,
+      constrain pos to within bounds of simulation to prevent clipping errors. */
+      node.pos.x = clamp(node.pos.x, min.x, max.x)
+      node.pos.y = clamp(node.pos.y, min.y, max.y)
+    }
+  })
 }
 
 // Very simplistic and inacurrate but visually convincing collision.
@@ -92,7 +101,7 @@ export const collideObjectNode = (
   force: number,
 ) => {
   const scalar = volumeField(object, node.pos)
-  // Check if node is inside the object.
+  // Check if node is inside the object (-ve is inside)
   if (scalar < 0) {
     node.momentum = sub(node.momentum, node.globalMomentum)
     /* Push node away from softbody, in the direction of the nodes normal,
