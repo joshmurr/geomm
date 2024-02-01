@@ -6,5 +6,5 @@
     "declarationDir": "lib/types"
   },
   "include": ["src"],
-  "exclude": ["lib", "src/quadtree.ts"]
+  "exclude": ["lib"]
 }

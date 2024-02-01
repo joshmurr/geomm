@@ -41,3 +41,13 @@ export type Settings = {
 export type UnfiformSettings = {
   [key: string]: Exclude<Settings, { type: 'file' }>
 }
+
+export type RenderingOpts = {
+  strokeStyle?: string
+  fillStyle?: string
+  lineWidth?: number
+  close?: boolean
+  fill?: boolean
+  stroke?: boolean
+  resolution?: number
+}

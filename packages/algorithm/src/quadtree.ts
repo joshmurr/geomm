@@ -1,33 +1,42 @@
 import type { AABB, Vec2 } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
 
+const MAX_DEPTH = 4
+
 export type Quadtree = {
   bounds: AABB
-  nodes: Quadtree[] | Vec2 | undefined
+  nodes?: Quadtree[] | Vec2 | undefined
 }
 
-export const aabb = (center: Vec2, half: number) => ({ center, half })
+export const aabb = (center: Vec2, halfWidth: number, halfHeight: number) => ({
+  center,
+  halfWidth,
+  halfHeight,
+})
 
-const contains = (rect: AABB, p: Vec2) => {
-  const { center, half } = rect
+export const quad = (origin: Vec2, size: Vec2) => ({ origin, size })
+
+export const contains = (rect: AABB, p: Vec2) => {
+  const { center, halfWidth, halfHeight } = rect
   const { x, y } = p
   return (
-    x >= center.x - half &&
-    x <= center.x + half &&
-    y >= center.y - half &&
-    y <= center.y + half
+    x >= center.x - halfWidth &&
+    x < center.x + halfWidth + 1 &&
+    y >= center.y - halfHeight &&
+    y < center.y + halfHeight + 1
   )
 }
 
-export const subdivide = (rect: AABB) => {
-  const { center, half } = rect
+export const subdivide = (rect: AABB): AABB[] => {
+  const { center, halfWidth, halfHeight } = rect
   const { x, y } = center
-  const h = half / 2
+  const hw = halfWidth / 2
+  const hh = halfHeight / 2
   return [
-    aabb(vec2(x - h, y - h), h),
-    aabb(vec2(x + h, y - h), h),
-    aabb(vec2(x - h, y + h), h),
-    aabb(vec2(x + h, y + h), h),
+    aabb(vec2(x - hw, y - hh), hw, hh),
+    aabb(vec2(x + hw + 1, y - hh), hw, hh),
+    aabb(vec2(x - hw, y + hh + 1), hw, hh),
+    aabb(vec2(x + hw + 1, y + hh + 1), hw, hh),
   ]
 }
 
@@ -39,8 +48,7 @@ export const quadtree = (bounds: AABB) => {
 }
 
 export const insert = (tree: Quadtree, p: Vec2, d = 0) => {
-  if (d > 4) {
-    // Max depth
+  if (d > MAX_DEPTH) {
     return tree
   }
   const { bounds, nodes } = tree
@@ -58,10 +66,10 @@ export const insert = (tree: Quadtree, p: Vec2, d = 0) => {
     const current = nodes
     const n = subdivide(bounds).map(quadtree)
     tree.nodes = n.map((node) => {
-      return insert(node, p)
+      return insert(node, current, d + 1)
     }) as Quadtree[]
     tree.nodes = n.map((node) => {
-      return insert(node, current, d + 1)
+      return insert(node, p, d + 1)
     }) as Quadtree[]
 
     return tree
@@ -76,23 +84,44 @@ export const insert = (tree: Quadtree, p: Vec2, d = 0) => {
   return undefined
 }
 
+export const count = (tree: Quadtree): number => {
+  const { nodes } = tree
+  if (!nodes) return 0
+  if (!Array.isArray(nodes)) return 1
+  return nodes.reduce((acc, node) => acc + count(node), 0)
+}
+
 export const query = (tree: Quadtree, bounds: AABB): Vec2[] => {
-  const { center, half } = bounds
+  const results = [] as Vec2[]
+  const { center, halfWidth, halfHeight } = bounds
   const { x, y } = center
   const { bounds: treeBounds, nodes } = tree
-  const { center: treeCenter, half: treeHalf } = treeBounds
+  const {
+    center: treeCenter,
+    halfWidth: treeHW,
+    halfHeight: treeHH,
+  } = treeBounds
   const { x: treeX, y: treeY } = treeCenter
-  const treeMinX = treeX - treeHalf
-  const treeMaxX = treeX + treeHalf
-  const treeMinY = treeY - treeHalf
-  const treeMaxY = treeY + treeHalf
+  const treeMinX = treeX - treeHW
+  const treeMaxX = treeX + treeHW
+  const treeMinY = treeY - treeHH
+  const treeMaxY = treeY + treeHH
 
-  if (treeMinX > x + half) return []
-  if (treeMaxX < x - half) return []
-  if (treeMinY > y + half) return []
-  if (treeMaxY < y - half) return []
+  if (treeMinX > x + halfWidth) return results
+  if (treeMaxX < x - halfWidth) return results
+  if (treeMinY > y + halfHeight) return results
+  if (treeMaxY < y - halfHeight) return results
 
-  if (!nodes) return []
-  if (!Array.isArray(nodes)) return [nodes]
-  return nodes.flatMap((node) => query(node, bounds))
+  if (!nodes) {
+    return results
+  }
+  if (!Array.isArray(nodes)) {
+    if (contains(bounds, nodes)) results.push(nodes)
+    return results
+  }
+  for (const node of nodes) {
+    results.push(...query(node, bounds))
+  }
+
+  return results
 }

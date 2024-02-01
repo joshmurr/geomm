@@ -1,5 +1,6 @@
 import type { Polygon, PhysicsObject2D } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
+import { RenderingOpts } from './api'
 
 export const drawPolygon = (
   ctx: CanvasRenderingContext2D,
@@ -9,14 +10,17 @@ export const drawPolygon = (
     rotation = 0,
     strokeStyle = 'grey',
     fillStyle = 'lightGrey',
-  }: Polygon,
+    fill = false,
+    stroke = true,
+    lineWidth = 1,
+  }: RenderingOpts & Polygon,
 ) => {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate(rotation)
   ctx.strokeStyle = strokeStyle
   ctx.fillStyle = fillStyle
-  ctx.lineWidth = 3
+  ctx.lineWidth = lineWidth
   ctx.beginPath()
   for (let i = 0; i < verts.length; i++) {
     if (i === 0) {
@@ -26,8 +30,8 @@ export const drawPolygon = (
     }
   }
   ctx.closePath()
-  ctx.fill()
-  ctx.stroke()
+  if (fill) ctx.fill()
+  if (stroke) ctx.stroke()
   ctx.restore()
 }
 
