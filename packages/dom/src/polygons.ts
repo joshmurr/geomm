@@ -1,4 +1,4 @@
-import type { Polygon, PhysicsObject2D } from '@geomm/api'
+import type { Polygon, PhysicsObject2D, AABB } from '@geomm/api'
 import { vec2 } from '@geomm/maths'
 import { RenderingOpts } from './api'
 
@@ -36,6 +36,22 @@ export const drawPolygon = (
 }
 
 export const drawAABB = (
+  ctx: CanvasRenderingContext2D,
+  { center, halfWidth, halfHeight }: AABB,
+  color = 'black',
+) => {
+  const { x, y } = center
+  ctx.strokeStyle = color
+  ctx.beginPath()
+  ctx.moveTo(x - halfWidth, y + halfHeight)
+  ctx.lineTo(x - halfWidth, y - halfHeight)
+  ctx.lineTo(x + halfWidth, y - halfHeight)
+  ctx.lineTo(x + halfWidth, y + halfHeight)
+  ctx.lineTo(x - halfWidth, y + halfHeight)
+  ctx.stroke()
+}
+
+export const drawPhysicsObject = (
   ctx: CanvasRenderingContext2D,
   { pos, rotation, aabb }: PhysicsObject2D,
 ) => {
