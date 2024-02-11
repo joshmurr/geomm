@@ -1,6 +1,36 @@
 export type Vec2 = { x: number; y: number }
-
 export type Vec3 = { x: number; y: number; z: number }
+export type Vec4 = { x: number; y: number; z: number; w: number }
+
+export type Mat3 = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+]
+export type Mat4 = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+]
 
 export type Polygon = {
   verts: Vec2[]

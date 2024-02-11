@@ -8,7 +8,12 @@ import {
   sin,
   viewMat,
 } from '@geomm/maths'
-import { computeFaceNormals, cube, icosahedron } from '@geomm/geometry'
+import {
+  computeFaceNormals,
+  indexedCube,
+  icosahedron,
+  indexedIcosahedron,
+} from '@geomm/geometry'
 import { appendEl } from '@geomm/dom'
 
 const vertShader = `#version 300 es
@@ -36,7 +41,7 @@ void main(){
   vec3 directionalLightColor = vec3(1, 1, 1);
   vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
 
-  vec4 transformedNormal = u_NormalMatrix * vec4(i_FaceNormal, 1.0);
+  vec4 transformedNormal = u_NormalMatrix * vec4(i_Normal, 1.0);
 
   float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
   v_Lighting = ambientLight + (directionalLightColor * directional);
@@ -53,11 +58,12 @@ in vec4 v_Normal;
 out vec4 OUTCOLOUR;
 
 void main(){
-  /* OUTCOLOUR = vec4(vec3(0.6, 0.1, 0.8) * v_Lighting, 1.0); */
-  OUTCOLOUR = vec4(v_Normal.xyz, 1.0);
+  OUTCOLOUR = vec4(vec3(0.6, 0.1, 0.8) * v_Lighting, 1.0);
+  /* OUTCOLOUR = vec4(v_Normal.xyz, 1.0); */
+  /* OUTCOLOUR = vec4(v_Lighting, 1.0); */
 }`
 
-const shape = icosahedron
+const shape = indexedCube
 computeFaceNormals(shape)
 
 const [c, gl] = webgl2Canvas(512, 512)

@@ -19,7 +19,7 @@ export const cross3 = (a: Vec3, b: Vec3) =>
 
 export const normalize3 = (a: Vec3) => {
   const len = Math.sqrt(dot3(a, a))
-  return vec3(a.x / len, a.y / len, a.z / len)
+  return len === 0 ? vec3(0, 0, 0) : vec3(a.x / len, a.y / len, a.z / len)
 }
 export const mag3 = (a: Vec3) => Math.sqrt(dot3(a, a))
 
