@@ -1,6 +1,6 @@
 {
   "name": "@geomm/maths",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "",
   "type": "module",
   "module": "./lib/index.js",
@@ -10,7 +10,8 @@
   "license": "ISC",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf ./lib ./tsconfig.tsbuildinfo"
+    "clean": "rm -rf ./lib ./tsconfig.tsbuildinfo",
+    "test": "vitest"
   },
   "files": [
     "./lib/**/*.js",
@@ -34,7 +35,9 @@
     }
   },
   "dependencies": {
-    "@geomm/api": "*",
-    "gl-matrix": "^3.4.3"
+    "@geomm/api": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.7"
   }
 }

@@ -1,4 +1,4 @@
-import { EPSILON } from './core'
+import { EPSILON } from './core.js'
 
 /* https://fotino.me/2d-parametric-collision-detection/ */
 

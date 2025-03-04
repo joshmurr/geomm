@@ -15,7 +15,7 @@ export const div3 = (a: Vec3, b: Vec3) => vec3(a.x / b.x, a.y / b.y, a.z / b.z)
 export const dot3 = (a: Vec3, b: Vec3) => a.x * b.x + a.y * b.y + a.z * b.z
 
 export const cross3 = (a: Vec3, b: Vec3) =>
-  vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.z)
+  vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
 
 export const normalize3 = (a: Vec3) => {
   const len = Math.sqrt(dot3(a, a))
