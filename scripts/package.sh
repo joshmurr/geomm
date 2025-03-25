@@ -53,7 +53,7 @@ EOF
     },
   },
   "dependencies": {
-    "@geomm/api": "*"
+    "@geomm/api": "workspace:*"
   }
 }
 EOF
