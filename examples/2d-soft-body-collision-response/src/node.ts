@@ -1,4 +1,4 @@
-import type { AABB, Vec2 } from '@geomm/api'
+import type { Vec2 } from '@geomm/api'
 import {
   add,
   clamp,
@@ -38,7 +38,7 @@ export const createNode = (
 
 export const calculateGlobal = (node: Node, sb: SoftBody) => {
   /* The vector math here recovers the average
- orbital momentum from the sb angular momentum. */
+ orbital momentum from the softbody angular momentum. */
   const _pos = sub(node.pos, sb.pos)
   let _angular = rotate(_pos, radians(sb.angularMomentum.z))
   _angular = sub(_angular, _pos)
@@ -53,7 +53,7 @@ export const applyDamping = (node: Node) => {
   node.momentum = add(node.momentum, node.globalMomentum)
 }
 
-export const integrateExternal = (node: Node, force: Vec2) => {
+export const applyForce = (node: Node, force: Vec2) => {
   node.momentum = add(node.momentum, force)
 }
 

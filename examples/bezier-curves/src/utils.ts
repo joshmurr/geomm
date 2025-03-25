@@ -1,4 +1,4 @@
-import { lerp } from '@geomm/geometry'
+import { lerp } from '@geomm/maths'
 import type { Curve } from './types'
 
 export const lerpCurve = (curveA: Curve, curveB: Curve, t: number) => {

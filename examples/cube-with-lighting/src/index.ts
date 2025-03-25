@@ -1,19 +1,17 @@
 import { initProgram, setUniforms, webgl2Canvas } from '@geomm/webgl'
 import {
   cos,
-  identityMat,
-  matFromTransformations,
-  normalMatFromModel,
-  projectionMat,
+  createAxisAngleRotationMatrix,
+  createPerspectiveMatrix,
+  createViewMatrix,
+  identity,
+  matmul,
+  normalMat,
   sin,
-  viewMat,
+  translate,
+  vec3,
 } from '@geomm/maths'
-import {
-  computeFaceNormals,
-  indexedCube,
-  icosahedron,
-  indexedIcosahedron,
-} from '@geomm/geometry'
+import { computeFaceNormals, indexedCube } from '@geomm/geometry'
 import { appendEl } from '@geomm/dom'
 
 const vertShader = `#version 300 es
@@ -69,10 +67,22 @@ computeFaceNormals(shape)
 const [c, gl] = webgl2Canvas(512, 512)
 appendEl(c)
 
+const eye = vec3(0, 0, 0)
+const target = vec3(0, 0, -1)
+const up = vec3(0, 1, 0)
+
+const viewMat = createViewMatrix(eye, target, up)
+
+const fovY = Math.PI / 4
+const aspect = 1
+const NEAR = 0.1
+const FAR = 50
+const perspectiveMat = createPerspectiveMatrix(fovY, aspect, NEAR, FAR)
+
 const uniforms = {
-  u_ModelMatrix: identityMat(),
-  u_ViewMatrix: viewMat(),
-  u_ProjectionMatrix: projectionMat(),
+  u_ModelMatrix: identity,
+  u_ViewMatrix: viewMat,
+  u_ProjectionMatrix: perspectiveMat,
 }
 
 const { program, vao, setters } = initProgram(gl, {
@@ -95,19 +105,16 @@ const draw = (time: number) => {
 
   const smallTime = time * 0.001
 
-  const modelViewMat = matFromTransformations({
-    translation: [0, 0, -6],
-    rotation: {
-      axis: [cos(sin(smallTime)), cos(sin(smallTime)), sin(cos(smallTime))],
-      angle: smallTime,
-    },
-    scale: [1, 1, 1],
-  })
+  const rotationMat = createAxisAngleRotationMatrix(
+    vec3(cos(sin(smallTime)), cos(sin(smallTime)), sin(cos(smallTime))),
+    smallTime,
+  )
+  const modelViewMat = matmul(translate(identity, vec3(0, 0, -6)), rotationMat)
 
   setUniforms(setters, {
     ...uniforms,
     u_ModelMatrix: modelViewMat,
-    u_NormalMatrix: normalMatFromModel(modelViewMat),
+    u_NormalMatrix: normalMat(modelViewMat),
   })
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)

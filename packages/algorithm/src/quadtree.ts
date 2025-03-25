@@ -3,9 +3,15 @@ import { vec2 } from '@geomm/maths'
 
 const MAX_DEPTH = 4
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type Node = {
+  pos: Vec2
+  [key: string]: any
+}
+
 export type Quadtree = {
   bounds: AABB
-  nodes?: Quadtree[] | Vec2 | undefined
+  nodes?: Quadtree[] | Node | undefined
 }
 
 export const aabb = (center: Vec2, halfWidth: number, halfHeight: number) => ({
@@ -16,9 +22,9 @@ export const aabb = (center: Vec2, halfWidth: number, halfHeight: number) => ({
 
 export const quad = (origin: Vec2, size: Vec2) => ({ origin, size })
 
-export const contains = (rect: AABB, p: Vec2) => {
+export const contains = (rect: AABB, { pos }: Node) => {
   const { center, halfWidth, halfHeight } = rect
-  const { x, y } = p
+  const { x, y } = pos
   return (
     x >= center.x - halfWidth &&
     x < center.x + halfWidth + 1 &&
@@ -47,7 +53,7 @@ export const quadtree = (bounds: AABB) => {
   }
 }
 
-export const insert = (tree: Quadtree, p: Vec2, d = 0) => {
+export const insert = (tree: Quadtree, p: Node, d = 0) => {
   if (d > MAX_DEPTH) {
     return tree
   }
@@ -91,8 +97,8 @@ export const count = (tree: Quadtree): number => {
   return nodes.reduce((acc, node) => acc + count(node), 0)
 }
 
-export const query = (tree: Quadtree, bounds: AABB): Vec2[] => {
-  const results = [] as Vec2[]
+export const query = (tree: Quadtree, bounds: AABB): Node[] => {
+  const results = [] as Node[]
   const { center, halfWidth, halfHeight } = bounds
   const { x, y } = center
   const { bounds: treeBounds, nodes } = tree

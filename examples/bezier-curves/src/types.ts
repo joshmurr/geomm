@@ -1,6 +1,6 @@
-import type { Vec } from '@geomm/geometry/lib/api'
+import type { Vec2 } from '@geomm/api'
 
-export type Curve = [Vec, Vec, Vec, Vec]
+export type Curve = [Vec2, Vec2, Vec2, Vec2]
 
 export type CurveDesc = {
   id: string | null

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>3d-matrices-css · @geomm</title>
+    <style>
+      body {
+      }
+
+      .clip,
+      .word {
+        display: inline-block;
+      }
+
+      .word {
+        backface-visibility: visible;
+        transition: all 0.4s cubic-bezier(0.58, 2, 0.59, 0.65);
+        transition-property: transform, opacity;
+        transition-delay: 0;
+        transform-style: preserve-3d;
+        transform-origin: center center;
+        white-space: pre;
+        text-rendering: optimizeLegibility;
+        transform: var(--mat);
+        opacity: var(--op);
+      }
+    </style>
+  </head>
+  <body>
+    <p class="container"></p>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>

@@ -1,6 +1,7 @@
 {
-	"extends": "../tsconfig.json",
-	"include": ["src/**/*"],
-	"compilerOptions": {
-	}
+  "extends": "../../tsconfig.json",
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "lib": ["dom", "es2019", "es2020"]
+  }
 }

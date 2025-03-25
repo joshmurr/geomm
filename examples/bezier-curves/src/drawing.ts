@@ -1,9 +1,9 @@
-import { vec } from '@geomm/geometry'
-import type { Vec } from '@geomm/geometry/lib/api'
+import { vec2 } from '@geomm/maths'
+import type { Vec2 } from '@geomm/api'
 
 export const drawPoint = (
   ctx: CanvasRenderingContext2D,
-  v: Vec,
+  v: Vec2,
   color = 'black',
 ) => {
   ctx.fillStyle = color
@@ -14,8 +14,8 @@ export const drawPoint = (
 
 export const drawLine = (
   ctx: CanvasRenderingContext2D,
-  v1: Vec,
-  v2: Vec,
+  v1: Vec2,
+  v2: Vec2,
   color = 'black',
 ) => {
   ctx.strokeStyle = color
@@ -27,10 +27,10 @@ export const drawLine = (
 
 export const drawCurve = (
   ctx: CanvasRenderingContext2D,
-  start: Vec,
-  v2: Vec,
-  v3: Vec,
-  end: Vec,
+  start: Vec2,
+  v2: Vec2,
+  v3: Vec2,
+  end: Vec2,
   color = 'black',
 ) => {
   ctx.strokeStyle = color
@@ -42,10 +42,10 @@ export const drawCurve = (
 
 export const drawCurveWithControlPoints = (
   ctx: CanvasRenderingContext2D,
-  start: Vec,
-  v2: Vec,
-  v3: Vec,
-  end: Vec,
+  start: Vec2,
+  v2: Vec2,
+  v3: Vec2,
+  end: Vec2,
   color = 'black',
 ) => {
   drawLine(ctx, start, v2, 'grey')
@@ -60,7 +60,7 @@ export const drawCurveWithControlPoints = (
 
 export const drawCircle = (
   ctx: CanvasRenderingContext2D,
-  v: Vec,
+  v: Vec2,
   r: number,
   color = 'black',
 ) => {
@@ -70,6 +70,6 @@ export const drawCircle = (
   ctx.stroke()
 }
 
-export const toScreen = (ctx: CanvasRenderingContext2D, v: Vec) => {
-  return vec(v.x * ctx.canvas.width, v.y * ctx.canvas.height)
+export const toScreen = (ctx: CanvasRenderingContext2D, v: Vec2) => {
+  return vec2(v.x * ctx.canvas.width, v.y * ctx.canvas.height)
 }

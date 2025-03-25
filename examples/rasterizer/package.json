@@ -15,11 +15,12 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
-    "@geomm/api": "*",
-    "@geomm/core": "*",
-    "@geomm/dom": "*",
-    "@geomm/geometry": "*",
-    "@geomm/maths": "*"
+    "@geomm/api": "workspace:*",
+    "@geomm/core": "workspace:*",
+    "@geomm/dom": "workspace:*",
+    "@geomm/geometry": "workspace:*",
+    "@geomm/maths": "workspace:*",
+    "@geomm/color": "workspace:*"
   },
   "browser": {
     "process": false

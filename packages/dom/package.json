@@ -28,11 +28,12 @@
   "author": "Josh Murr",
   "license": "ISC",
   "dependencies": {
-    "@geomm/api": "*",
-    "@geomm/maths": "*",
-    "@geomm/core": "*",
-    "@geomm/physics": "*",
-    "@geomm/geometry": "*",
+    "@geomm/api": "workspace:*",
+    "@geomm/maths": "workspace:*",
+    "@geomm/core": "workspace:*",
+    "@geomm/color": "workspace:*",
+    "@geomm/physics": "workspace:*",
+    "@geomm/geometry": "workspace:*",
     "gl-matrix": "^3.4.3"
   }
 }

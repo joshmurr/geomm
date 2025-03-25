@@ -4,10 +4,10 @@
   "description": "A collection of tools for creative computing.",
   "scripts": {
     "build": "tsc --build",
-    "build:all": "npm run build --workspaces",
+    "build:all": "pnpm -r build",
     "watch": "tsc -b --watch",
     "clean:tsbuild": "find . -name \"*.tsbuildinfo\" -type f -delete",
-    "patch-n-publish": "npm version patch && npm publish"
+    "patch-n-publish": "pnpm version patch && pnpm publish"
   },
   "keywords": [
     "3d",
@@ -18,18 +18,7 @@
   ],
   "author": "Josh Murr",
   "license": "ISC",
-  "packageManager": "npm@9.8.1",
-  "workspaces": [
-    "packages/api",
-    "packages/core",
-    "packages/maths",
-    "packages/color",
-    "packages/dom",
-    "packages/algorithm",
-    "packages/geometry",
-    "packages/webgl",
-    "packages/physics"
-  ],
+  "packageManager": "pnpm@9.15.3",
   "devDependencies": {
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

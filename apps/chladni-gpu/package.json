@@ -15,7 +15,11 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
-    "@geomm/api": "^1.0.0"
+    "@geomm/api": "workspace:*",
+    "@geomm/dom": "workspace:*",
+    "@geomm/color": "workspace:*",
+    "@geomm/maths": "workspace:*",
+    "@geomm/webgl": "workspace:*"
   },
   "browser": {
     "process": false

@@ -12,7 +12,7 @@ export const vec4 = (x: number, y: number, z: number, w: number) => ({
  */
 export const transformVec3 = (
   vec: { x: number; y: number; z: number },
-  matrix: number[],
+  matrix: Mat4,
 ) => {
   // For 3D vectors, we use w=1 for points (affected by translation)
   const w = 1
@@ -102,7 +102,7 @@ export const transformVec4 = (a: Vec4, m: Mat4) => {
  */
 export const transformPoint = (
   point: { x: number; y: number; z: number },
-  matrix: number[],
+  matrix: Mat4,
 ) => {
   return transformVec3(point, matrix)
 }

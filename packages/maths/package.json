@@ -35,7 +35,8 @@
     }
   },
   "dependencies": {
-    "@geomm/api": "workspace:*"
+    "@geomm/api": "workspace:*",
+    "@geomm/core": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.0.7"

@@ -239,6 +239,12 @@ const settings: Settings = {
       audioPlaying = !audioPlaying
     },
   },
+  dimensions: {
+    type: 'select',
+    val: '800x800',
+    options: ['400x400', '600x600', '800x800', '1000x1000', '1200x1200', '1400x1400'],
+    callback: () => init()
+  },
 }
 const { c, gl } = initOutput(800, 800)
 
@@ -305,8 +311,8 @@ function startRecording() {
       } catch (e2) {
         alert(
           'MediaRecorder is not supported by this browser.\n\n' +
-            'Try Firefox 29 or later, or Chrome 47 or later, ' +
-            'with Enable experimental Web Platform features enabled from chrome://flags.',
+          'Try Firefox 29 or later, or Chrome 47 or later, ' +
+          'with Enable experimental Web Platform features enabled from chrome://flags.',
         )
         console.error('Exception while creating MediaRecorder:', e2)
         return
@@ -432,6 +438,7 @@ const audioTex = createTexture(gl, {
 })
 
 async function init() {
+  c.width = c.height = parseInt(settings.dimensions.val.split('x')[0])
   const data = await selectedInitialDataFn(settings.particleCount.val)
   const numParticles = data.length / 2
 

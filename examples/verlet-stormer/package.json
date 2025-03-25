@@ -17,7 +17,8 @@
   "dependencies": {
     "@geomm/api": "*",
     "@geomm/dom": "*",
-    "@geomm/maths": "*"
+    "@geomm/maths": "*",
+    "@geomm/physics": "*"
   },
   "browser": {
     "process": false

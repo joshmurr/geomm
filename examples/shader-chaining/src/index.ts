@@ -1,5 +1,5 @@
 import { appendEl } from '@geomm/dom'
-import { quad } from '@geomm/geometry'
+import { indexedQuad } from '@geomm/geometry'
 import {
   basicVert,
   createFramebuffer,
@@ -48,7 +48,7 @@ const {
 } = initProgram(gl, {
   vertShader: basicVert,
   fragShader: programFrag,
-  bufferGroup: quad,
+  bufferGroup: indexedQuad,
 })
 
 const {
@@ -58,7 +58,7 @@ const {
 } = initProgram(gl, {
   vertShader: basicVert,
   fragShader: outputFrag,
-  bufferGroup: quad,
+  bufferGroup: indexedQuad,
 })
 
 const renderTex = createTexture(gl, {
@@ -87,7 +87,7 @@ simpleRender(gl, true, [
     program: program,
     uniforms: programUniforms,
     setters: programUniformSetters,
-    viewport: Object.values(programRes),
+    viewport: [programRes.x, programRes.y],
     fbo,
   },
   {

@@ -1,9 +1,9 @@
+import { Vec2 } from '@geomm/api'
 import { appendEl, canvas, makeGui, Settings } from '@geomm/dom'
-import { type Vec, vec, toScreen } from '@geomm/geometry'
-import { abs, PI, randRange, sin } from '@geomm/maths'
+import { abs, PI, randRange, sin, toScreen } from '@geomm/maths'
 
 type Particle = {
-  pos: Vec
+  pos: Vec2
 }
 
 let size = [window.innerWidth, window.innerHeight] as const

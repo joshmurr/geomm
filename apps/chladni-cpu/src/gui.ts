@@ -1,5 +1,4 @@
-import { appendEl, createEl } from '@geomm/dom'
-import type { Settings } from '.'
+import { appendEl, createEl, type Settings } from '@geomm/dom'
 
 export const makeGui = (settings: Settings) => {
   const gui = createEl('div') as HTMLDivElement

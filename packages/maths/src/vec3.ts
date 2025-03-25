@@ -46,3 +46,5 @@ export const centroid3Float = (
     (a[2] + b[2] + c[2]) / 3,
   ])
 }
+
+export const reflect3 = (v: Vec3, n: Vec3) => sub3(v, scale3(n, 2 * dot3(v, n)))

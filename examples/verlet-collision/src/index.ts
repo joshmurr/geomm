@@ -1,30 +1,30 @@
-import { aabb, fixedGrid, query } from '@geomm/algorithm'
+import type { Vec2 } from '@geomm/api'
 import { appendEl, createEl } from '@geomm/dom'
-import { add, mag, scale, sub, vec, Vec } from '@geomm/geometry'
-import { min, randInt, sqrt } from '@geomm/maths'
+import { add, dot, scale, sub, vec2 } from '@geomm/maths'
+import { randInt, sqrt } from '@geomm/maths'
+import { fixedGrid } from '@geomm/algorithm'
 
 type Node = {
-  pos: Vec
+  pos: Vec2
 }
 
 type Particle = Node & {
   id: number
-  prevPos: Vec
-  acc: Vec
+  prevPos: Vec2
+  acc: Vec2
   mass: number
   col: string
 }
 
 const settings = {
-  N_PARTICLES: 512,
+  N_PARTICLES: 64,
+  GRID_SIZE: 32,
 }
 
-const SIZE = vec(window.innerWidth, window.innerHeight)
-const GRAVITY = vec(0, 0.5)
+const SIZE = vec2(window.innerWidth, window.innerHeight)
+const GRAVITY = vec2(0, 0.5)
 
 const DAMPING = 0.5
-
-const grid = fixedGrid(SIZE.x, SIZE.y, 16)
 
 const c = createEl('canvas', {
   width: SIZE.x,
@@ -43,29 +43,13 @@ const grayscaleColors = Array.from({ length: 128 }).map((_, i) => {
 
 const particles: Particle[] = []
 
-const bounds = aabb(vec(SIZE.x / 2, SIZE.y / 2), SIZE.y / 2)
-/* Array.from({ length: settings.N_PARTICLES }).map((_, i) => { */
-/*   const angle = randRange(0, Math.PI * 2) */
-/*   const initialPos = vec( */
-/*     SIZE.x / 2 + cos(angle) * 100, */
-/*     SIZE.y / 2 + sin(angle) * 100, */
-/*   ) */
-/*   return { */
-/*     pos: initialPos, */
-/*     prevPos: initialPos, */
-/*     acc: vec(0, 0), */
-/*     mass: 8, */
-/*     col: grayscaleColors[i % grayscaleColors.length], */
-/*   } */
-/* }) */
-
-const addParticle = (parts: Particle[], pos: Vec, counter: number) => {
+const addParticle = (parts: Particle[], pos: Vec2, counter: number) => {
   parts.push({
     id: counter,
     pos,
     prevPos: pos,
-    acc: vec(20, -20.0),
-    mass: 8,
+    acc: vec2(20, -20.0),
+    mass: settings.GRID_SIZE / 2,
     col: grayscaleColors[randInt(0, grayscaleColors.length - 1)],
   })
 
@@ -87,11 +71,11 @@ const updateParticle = (p: Particle, dt: number) => {
   p.prevPos = p.pos
   const acceleration = scale(p.acc, dt * dt)
   const newPos = add(p.pos, add(vel, acceleration))
-  p.acc = vec(0, 0)
+  p.acc = vec2(0, 0)
   p.pos = newPos
 }
 
-const applyForce = (p: Particle, force: Vec) => {
+const applyForce = (p: Particle, force: Vec2) => {
   const { acc, mass } = p
   p.acc = add(acc, scale(force, 1 / mass))
 }
@@ -122,45 +106,46 @@ const bound = (p: Particle) => {
   }
 }
 
-const drawGrid = (ctx: CanvasRenderingContext2D) => {
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+const collide = (p: Particle, p2: Particle, preserveImpulse = false) => {
+  const { pos, mass } = p
+  const { pos: pos2, mass: mass2 } = p2
+  const v = sub(pos, pos2)
+  const distSq = v.x * v.x + v.y * v.y
+  const minDist = mass + mass2
 
-  const { cellSize } = grid
+  if (distSq < minDist * minDist) {
+    const dist = sqrt(distSq)
+    const factor = (dist - minDist) / dist
 
-  for (let x = 0; x < SIZE.x; x += cellSize) {
-    ctx.beginPath()
-    ctx.moveTo(x, 0)
-    ctx.lineTo(x, SIZE.y)
-    ctx.stroke()
+    /* Resolve the overlapping bodies */
+    const displacement = scale(v, factor * 0.5)
+    p.pos = sub(p.pos, displacement)
+    p2.pos = add(p2.pos, displacement)
+
+    if (preserveImpulse) {
+      /* Compute the projected component factors */
+      const v1 = sub(pos, p.prevPos)
+      const v2 = sub(pos2, p2.prevPos)
+      const f1 = (DAMPING * dot(v1, v)) / distSq
+      const f2 = (DAMPING * dot(v2, v)) / distSq
+
+      /* Swap the projected components */
+      const v1p = add(v1, sub(scale(v, f2), scale(v, f1)))
+      const v2p = add(v2, sub(scale(v, f1), scale(v, f2)))
+
+      /* Previous pos is adjusted by the projected component */
+      p.prevPos = sub(pos, v1p)
+      p2.prevPos = sub(pos2, v2p)
+    }
   }
-
-  for (let y = 0; y < SIZE.y; y += cellSize) {
-    ctx.beginPath()
-    ctx.moveTo(0, y)
-    ctx.lineTo(SIZE.x, y)
-    ctx.stroke()
-  }
-}
-
-const drawCell = (ctx: CanvasRenderingContext2D, cell: number) => {
-  const { cellSize } = grid
-  const { x, y } = grid.cellPos(cell)
-  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'
-  ctx.fillRect(SIZE.x - x - cellSize, SIZE.y - y - cellSize, cellSize, cellSize)
 }
 
 const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
   const { pos, mass } = p
 
-  /* const cell = grid.getCell(pos.x, pos.y) */
-  const neighbours = grid.neighbours(pos, grid.cellSize)
-
-  if (neighbours.length === 0) return
-
   /* particles.slice(i + 1).forEach((p2) => { */
-  neighbours.forEach((p2idx) => {
-    if (i === p2idx) return
-    const p2 = particles[p2idx]
+  particles.forEach((p2, j) => {
+    if (i === j) return
     const { pos: pos2, mass: mass2 } = p2
 
     const dir = sub(pos, pos2)
@@ -168,7 +153,6 @@ const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
     const minDist = mass + mass2
 
     if (distSq < minDist * minDist) {
-      /* drawCell(ctx, i) */
       const dist = sqrt(distSq)
       const n = scale(dir, 1 / dist)
 
@@ -180,7 +164,7 @@ const checkCollisions = (p: Particle, i: number, particles: Particle[]) => {
   })
 }
 
-const steps = 8
+const steps = 4
 const dt = 1
 let frame = 0
 const filterStrength = 20
@@ -193,10 +177,8 @@ const step = (particles: Particle[], ctx: CanvasRenderingContext2D) => {
   for (let sub = 0; sub < steps; sub++) {
     particles.forEach((p) => applyForce(p, GRAVITY))
 
-    grid.clear()
-    particles.forEach((p, idx) => grid.add(p.pos, idx))
-
-    particles.forEach((p, i) => checkCollisions(p, i, particles))
+    /* particles.forEach((p, i) => checkCollisions(p, i, particles)) */
+    fixedGrid(particles, settings.GRID_SIZE, collide)
     particles.forEach((p) => bound(p))
     particles.forEach((p) => updateParticle(p, dt / steps))
   }
@@ -206,13 +188,10 @@ const step = (particles: Particle[], ctx: CanvasRenderingContext2D) => {
   ctx.fillRect(0, 0, SIZE.x, SIZE.y)
   particles.forEach((p) => drawParticle(p, ctx))
 
-  drawGrid(ctx)
-
-  if (frame++ % 17 === 0)
+  if (frame++ % 7 === 0)
     nParticles = addParticle(
       particles,
-      vec(SIZE.x * 0.8, SIZE.y - 8),
-      /* vec(randInt(0, SIZE.x), randInt(0, SIZE.y)), */
+      vec2(SIZE.x * 0.8, settings.GRID_SIZE),
       nParticles,
     )
 

@@ -1,33 +1,18 @@
 import { appendEl, createEl } from '@geomm/dom'
+import { add, distance, mag, randInt, random, sub, vec2 } from '@geomm/maths'
 import {
-  add,
-  distance,
-  mag,
-  randInt,
-  random,
-  scale,
-  sub,
-  vec2,
-} from '@geomm/maths'
-import type { Vec2 } from '@geomm/api'
-
-type Particle = {
-  pos: Vec2
-  prevPos: Vec2
-  acc: Vec2
-  mass: number
-  col: string
-}
-
-type Stick = {
-  ids: [number, number]
-  len: number
-  strength: number
-}
+  VerletConnection,
+  VerletPoint,
+  accelerate,
+  applyForce,
+  bound,
+  inertia,
+  springConstrain,
+} from '@geomm/physics'
 
 type Shape = {
-  particles: Particle[]
-  connections: Stick[]
+  particles: VerletPoint[]
+  connections: VerletConnection[]
 }
 
 const settings = {
@@ -46,7 +31,7 @@ const c = createEl('canvas', {
 const ctx = c.getContext('2d') as CanvasRenderingContext2D
 appendEl(c)
 
-const particles: Particle[] = []
+const particles: VerletPoint[] = []
 const shapes: Shape[] = []
 
 const placeSquare = () => {
@@ -87,8 +72,8 @@ const placeCircle = () => {
   const center = vec2(SIZE.x / 2, SIZE.y / 2)
   const radius = 100
   const n = 16
-  const particles: Particle[] = []
-  const connections: Stick[] = []
+  const particles: VerletPoint[] = []
+  const connections: VerletConnection[] = []
 
   for (let i = 0; i < n; i++) {
     const angle = (i / n) * Math.PI * 2
@@ -129,58 +114,6 @@ const placeCircle = () => {
   })
 }
 
-const accelerate = (p: Particle, dt: number) => {
-  const { pos, acc } = p
-  p.pos = add(pos, scale(acc, dt * dt))
-  p.acc = vec2(0, 0)
-}
-
-const inertia = (p: Particle) => {
-  const { pos, prevPos } = p
-  p.prevPos = pos
-  p.pos = sub(scale(pos, 2), prevPos)
-}
-
-const applyForce = (p: Particle, force: Vec2) => {
-  const { acc } = p
-  p.acc = add(acc, force)
-}
-
-const simpleConstrain = (p: Particle) => {
-  const { pos, mass } = p
-  if (pos.x < mass) {
-    pos.x = mass
-  } else if (pos.x > SIZE.x - mass) {
-    pos.x = SIZE.x - mass
-  }
-  if (pos.y < mass) {
-    pos.y = mass
-  } else if (pos.y > SIZE.y - mass) {
-    pos.y = SIZE.y - mass
-  }
-}
-
-const rigidConstrain = (particles: Particle[], connections: Stick[]) => {
-  connections.forEach(({ ids, len, strength }) => {
-    const [i, j] = ids
-    const p = particles[i]
-    const p2 = particles[j]
-    const v = sub(p.pos, p2.pos)
-    const dist = mag(v) + 1e-6
-
-    const pInvWeight = 1 / p.mass
-    const p2InvWeight = 1 / p2.mass
-
-    const normDistStrength =
-      ((dist - len) / (dist * (pInvWeight + p2InvWeight))) * strength
-
-    const correction = scale(v, normDistStrength * pInvWeight)
-    const correction2 = scale(v, -normDistStrength * p2InvWeight)
-    p.pos = sub(p.pos, correction)
-    p2.pos = sub(p2.pos, correction2)
-  })
-}
-
 const filterStrength = 20
 let lastLoop = performance.now()
 let thisLoop = lastLoop
@@ -196,16 +129,14 @@ const step = () => {
     for (let sub = 0; sub < steps; sub++) {
       particles.forEach((p) => applyForce(p, GRAVITY))
       particles.forEach((p) => accelerate(p, dt))
-
-      rigidConstrain(particles, connections)
-
-      particles.forEach((p) => simpleConstrain(p))
+      connections.forEach((c) => springConstrain(c, particles))
+      particles.forEach((p) => bound(p, SIZE))
       particles.forEach((p) => inertia(p))
     }
 
     particles.forEach((p) => {
       const { pos, col, mass } = p
-      ctx.fillStyle = col
+      ctx.fillStyle = col || 'white'
       ctx.beginPath()
       ctx.arc(pos.x, pos.y, mass, 0, Math.PI * 2)
       ctx.fill()

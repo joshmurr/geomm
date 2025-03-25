@@ -23,5 +23,8 @@
       "default": "./lib/dispatch.js"
     }
   },
+  "dependencies": {
+    "@geomm/api": "workspace:*"
+  },
   "license": "ISC"
 }

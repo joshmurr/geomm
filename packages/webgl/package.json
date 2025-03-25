@@ -49,9 +49,9 @@
   "author": "Josh Murr",
   "license": "ISC",
   "dependencies": {
-    "@geomm/api": "*",
-    "@geomm/core": "*",
-    "@geomm/dom": "*",
-    "@geomm/maths": "*"
+    "@geomm/api": "workspace:*",
+    "@geomm/core": "workspace:*",
+    "@geomm/dom": "workspace:*",
+    "@geomm/maths": "workspace:*"
   }
 }

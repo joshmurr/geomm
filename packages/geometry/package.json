@@ -28,10 +28,10 @@
     }
   },
   "dependencies": {
-    "@geomm/api": "*",
-    "@geomm/maths": "*",
-    "@geomm/core": "*",
-    "@geomm/physics": "*",
-    "@geomm/webgl": "*"
+    "@geomm/api": "workspace:*",
+    "@geomm/maths": "workspace:*",
+    "@geomm/core": "workspace:*",
+    "@geomm/physics": "workspace:*",
+    "@geomm/webgl": "workspace:*"
   }
 }

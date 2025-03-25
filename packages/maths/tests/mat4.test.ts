@@ -1,5 +1,7 @@
 import { expect, describe, it } from 'vitest'
 import {
+  axisAngleToQuaternion,
+  createAxisAngleRotationMatrix,
   createOrthographicMatrix,
   createPerspectiveMatrix,
   createViewMatrix,
@@ -7,6 +9,7 @@ import {
   invertMatrix4x4,
   isInvertible,
   matmul,
+  rotateAxisAngle,
   rotateX,
   rotateXMat4,
   rotateY,
@@ -370,7 +373,7 @@ describe('invertMatrix4x4', () => {
       20,
       30,
       1, // Translation by (10, 20, 30)
-    ]
+    ] as Mat4
 
     // Expected inverse: translate by negative values
     const expectedInverse = [
@@ -393,7 +396,9 @@ describe('invertMatrix4x4', () => {
 
   it('inverts a scaling matrix correctly', () => {
     // A scaling matrix
-    const scalingMatrix = [2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1]
+    const scalingMatrix = [
+      2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1,
+    ] as Mat4
 
     // Expected inverse: reciprocal of scaling factors
     const expectedInverse = [
@@ -413,7 +418,7 @@ describe('invertMatrix4x4', () => {
       0,
       0,
       1,
-    ]
+    ] as Mat4
 
     const result = invertMatrix4x4(scalingMatrix)
 
@@ -431,7 +436,9 @@ describe('invertMatrix4x4', () => {
 
   it('inverts a complex matrix correctly', () => {
     // A more complex matrix
-    const complexMatrix = [1, 2, 3, 4, 0, 1, 0, 0, 0, 0, 1, 0, 5, 6, 7, 1]
+    const complexMatrix = [
+      1, 2, 3, 4, 0, 1, 0, 0, 0, 0, 1, 0, 5, 6, 7, 1,
+    ] as Mat4
 
     const inverse = invertMatrix4x4(complexMatrix)
 
@@ -467,7 +474,7 @@ describe('invertMatrix4x4', () => {
       0,
       0,
       1,
-    ]
+    ] as Mat4
 
     expect(() => invertMatrix4x4(singularMatrix)).toThrow()
   })
@@ -817,5 +824,203 @@ describe('createViewMatrix', () => {
     expect(() =>
       createViewMatrix(validEye, validTarget, { x: 0, y: 0, z: 0 }),
     ).toThrow()
+  })
+})
+
+describe('createAxisAngleRotationMatrix', () => {
+  it('creates identity matrix when angle is 0', () => {
+    const axis = { x: 0, y: 1, z: 0 }
+    const angle = 0
+
+    const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+
+    // Should match identity matrix
+    rotationMatrix.forEach((value, index) => {
+      expect(value).toBeCloseTo(identity[index])
+    })
+  })
+
+  it('creates correct matrix for rotation around x-axis', () => {
+    const axis = { x: 1, y: 0, z: 0 }
+    const angle = Math.PI / 2 // 90 degrees
+
+    const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+
+    // Should match x-axis rotation matrix
+    const expected = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1]
+
+    rotationMatrix.forEach((value, index) => {
+      expect(value).toBeCloseTo(expected[index])
+    })
+  })
+
+  it('creates correct matrix for rotation around y-axis', () => {
+    const axis = { x: 0, y: 1, z: 0 }
+    const angle = Math.PI / 2 // 90 degrees
+
+    const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+
+    // Should match y-axis rotation matrix
+    const expected = [0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1]
+
+    rotationMatrix.forEach((value, index) => {
+      expect(value).toBeCloseTo(expected[index])
+    })
+  })
+
+  it('creates correct matrix for rotation around z-axis', () => {
+    const axis = { x: 0, y: 0, z: 1 }
+    const angle = Math.PI / 2 // 90 degrees
+
+    const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+
+    // Should match z-axis rotation matrix
+    const expected = [0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+
+    rotationMatrix.forEach((value, index) => {
+      expect(value).toBeCloseTo(expected[index])
+    })
+  })
+
+  it('rotates vectors correctly with an arbitrary axis', () => {
+    // Rotation around the diagonal axis [1,1,1]
+    const axis = { x: 1, y: 1, z: 1 }
+    const angle = Math.PI / 3 // 60 degrees
+
+    const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+
+    // Test point
+    const point = { x: 1, y: 0, z: 0, w: 1 }
+
+    // Apply rotation
+    const rotatedPoint = transformVec4(point, rotationMatrix)
+
+    // After rotation, the point should be moved but maintain distance from origin
+    const distance = Math.sqrt(
+      rotatedPoint.x * rotatedPoint.x +
+        rotatedPoint.y * rotatedPoint.y +
+        rotatedPoint.z * rotatedPoint.z,
+    )
+
+    expect(distance).toBeCloseTo(1) // Should maintain unit distance
+
+    // Ensure the point has moved from its original position
+    expect(rotatedPoint.x).not.toBeCloseTo(point.x)
+    expect(rotatedPoint.y).not.toBeCloseTo(point.y)
+    expect(rotatedPoint.z).not.toBeCloseTo(point.z)
+  })
+})
+
+describe('rotateAxisAngle', () => {
+  it('applies axis-angle rotation to a matrix', () => {
+    // Start with a translation matrix
+    const translationMatrix = [
+      1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 10, 20, 30, 1,
+    ] as Mat4
+
+    // Rotate around the y-axis by 90 degrees
+    const axis = { x: 0, y: 1, z: 0 }
+    const angle = Math.PI / 2
+
+    const result = rotateAxisAngle(translationMatrix, axis, angle)
+
+    // Using the right multiplication (m * r), the translation component
+    // is not affected by the rotation - only the orientation changes
+    expect(result[12]).toBeCloseTo(10) // Translation x doesn't change
+    expect(result[13]).toBeCloseTo(20) // Translation y doesn't change
+    expect(result[14]).toBeCloseTo(30) // Translation z doesn't change
+
+    // The rotation part would have changed
+    expect(result[0]).toBeCloseTo(0) // cos(90°) = 0
+    expect(result[2]).toBeCloseTo(-1) // -sin(90°) = -1
+    expect(result[8]).toBeCloseTo(1) // sin(90°) = 1
+  })
+
+  it('preserves identity matrix when angle is 0', () => {
+    const axis = { x: 1, y: 1, z: 1 }
+    const angle = 0
+
+    const result = rotateAxisAngle(identity, axis, angle)
+
+    // Should still be identity
+    result.forEach((value, index) => {
+      expect(value).toBeCloseTo(identity[index])
+    })
+  })
+
+  it('composes with multiple rotations correctly', () => {
+    let matrix = identity
+
+    // Apply a sequence of rotations
+    // First around x
+    matrix = rotateAxisAngle(matrix, { x: 1, y: 0, z: 0 }, Math.PI / 4)
+
+    // Then around y
+    matrix = rotateAxisAngle(matrix, { x: 0, y: 1, z: 0 }, Math.PI / 4)
+
+    // Then around z
+    matrix = rotateAxisAngle(matrix, { x: 0, y: 0, z: 1 }, Math.PI / 4)
+
+    // The result should be different from the identity matrix
+    expect(matrix).not.toEqual(identity)
+
+    // Test point
+    const point = { x: 1, y: 0, z: 0, w: 1 }
+
+    // Apply the combined rotations
+    const rotatedPoint = transformVec4(point, matrix)
+
+    // Should maintain distance from origin
+    const distance = Math.sqrt(
+      rotatedPoint.x * rotatedPoint.x +
+        rotatedPoint.y * rotatedPoint.y +
+        rotatedPoint.z * rotatedPoint.z,
+    )
+
+    expect(distance).toBeCloseTo(1)
+  })
+})
+
+describe('axisAngleToQuaternion', () => {
+  it('creates the identity quaternion when angle is 0', () => {
+    const axis = { x: 1, y: 0, z: 0 }
+    const angle = 0
+
+    const quaternion = axisAngleToQuaternion(axis, angle)
+
+    // Identity quaternion is [0, 0, 0, 1]
+    expect(quaternion[0]).toBeCloseTo(0)
+    expect(quaternion[1]).toBeCloseTo(0)
+    expect(quaternion[2]).toBeCloseTo(0)
+    expect(quaternion[3]).toBeCloseTo(1)
+  })
+
+  it('creates correct quaternion for 90-degree x-axis rotation', () => {
+    const axis = { x: 1, y: 0, z: 0 }
+    const angle = Math.PI / 2
+
+    const quaternion = axisAngleToQuaternion(axis, angle)
+
+    // For 90° around x-axis: [sin(45°), 0, 0, cos(45°)]
+    const halfSqrt2 = Math.sqrt(2) / 2
+    expect(quaternion[0]).toBeCloseTo(halfSqrt2)
+    expect(quaternion[1]).toBeCloseTo(0)
+    expect(quaternion[2]).toBeCloseTo(0)
+    expect(quaternion[3]).toBeCloseTo(halfSqrt2)
+  })
+
+  it('handles non-normalized axis vectors', () => {
+    // Non-normalized axis
+    const axis = { x: 2, y: 0, z: 0 }
+    const angle = Math.PI / 2
+
+    const quaternion = axisAngleToQuaternion(axis, angle)
+
+    // Should normalize the axis automatically
+    const halfSqrt2 = Math.sqrt(2) / 2
+    expect(quaternion[0]).toBeCloseTo(halfSqrt2)
+    expect(quaternion[1]).toBeCloseTo(0)
+    expect(quaternion[2]).toBeCloseTo(0)
+    expect(quaternion[3]).toBeCloseTo(halfSqrt2)
   })
 })

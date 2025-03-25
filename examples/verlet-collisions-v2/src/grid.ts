@@ -1,6 +1,6 @@
-import type { Vec } from '@geomm/geometry'
+import type { Vec2 } from '@geomm/api'
 
-export const getHashBucketIndex = (cellPos: Vec, numBuckets: number) => {
+export const getHashBucketIndex = (cellPos: Vec2, numBuckets: number) => {
   const h1 = 0x8da6b343 // Large multiplicative constants;
   const h2 = 0xd8163841 // here arbitrarily chosen primes
   let n = h1 * cellPos.x + h2 * cellPos.y
@@ -9,7 +9,7 @@ export const getHashBucketIndex = (cellPos: Vec, numBuckets: number) => {
   return n
 }
 
-export const getCellPos = (pos: Vec, cellSize: number) => {
+export const getCellPos = (pos: Vec2, cellSize: number) => {
   const x = Math.floor(pos.x / cellSize)
   const y = Math.floor(pos.y / cellSize)
   return { x, y }
@@ -72,7 +72,7 @@ export const drawGridNumbered = (
 export const drawGridCell = (
   ctx: CanvasRenderingContext2D,
   cellSize: number,
-  cellPos: Vec,
+  cellPos: Vec2,
 ) => {
   const x = cellPos.x * cellSize
   const y = cellPos.y * cellSize

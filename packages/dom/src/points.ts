@@ -5,6 +5,8 @@ type Opts = {
   fillStyle?: string
   font?: string
   offset?: Vec2
+  lineWidth?: number
+  strokeStyle?: string
 }
 
 export const drawPoint = (
@@ -41,4 +43,25 @@ export const drawLabel = (
   ctx.fillStyle = fillStyle
   ctx.font = font
   ctx.fillText(text, x, y)
+}
+
+export const drawLine = (
+  ctx: CanvasRenderingContext2D,
+  points: Vec2[],
+  { strokeStyle = 'black', lineWidth = 1 }: Opts = {},
+) => {
+  points.forEach((p, i) => {
+    ctx.strokeStyle = strokeStyle
+    ctx.lineWidth = lineWidth
+    ctx.beginPath()
+    ctx.moveTo(p.x, p.y)
+
+    if (i === points.length - 1) {
+      ctx.lineTo(points[0].x, points[0].y)
+    } else {
+      ctx.lineTo(points[i + 1].x, points[i + 1].y)
+    }
+
+    ctx.stroke()
+  })
 }

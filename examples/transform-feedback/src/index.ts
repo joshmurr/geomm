@@ -1,8 +1,12 @@
-import { appendEl, createEl } from '@geomm/dom'
-import { createBufferInfo, createVAO, shaderProgram } from '@geomm/webgl'
+import { appendEl } from '@geomm/dom'
+import {
+  createBufferInfo,
+  createVAO,
+  shaderProgram,
+  webgl2Canvas,
+} from '@geomm/webgl'
 
-const c = createEl('canvas', { width: 512, height: 512 }) as HTMLCanvasElement
-const gl = c.getContext('webgl2') as WebGL2RenderingContext
+const [c, gl] = webgl2Canvas(512, 512)
 appendEl(c)
 
 const update_vs = `#version 300 es

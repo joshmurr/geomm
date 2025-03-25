@@ -17,8 +17,8 @@
     "./lib/**/*.d.ts"
   ],
   "dependencies": {
-    "@geomm/api": "*",
-    "@geomm/geometry": "*",
-    "@geomm/maths": "*"
+    "@geomm/api": "workspace:*",
+    "@geomm/geometry": "workspace:*",
+    "@geomm/maths": "workspace:*"
   }
 }

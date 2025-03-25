@@ -1,6 +1,6 @@
 import { Mat4, Vec3, Vec4 } from '@geomm/api'
 import { determinant3x3 } from './mat3'
-import { cross3, dot3, normalize3 } from './vec3'
+import { cross3, dot3, normalize3, vec3 } from './vec3'
 
 /* INFO: Column Major Matrices */
 
@@ -12,7 +12,7 @@ export const identity: Mat4 = [
   0, 0, 0, 1,
 ];
 
-export const matmul = (a: number[], b: number[]) => {
+export const matmul = <T extends number[]>(a: T, b: T): T => {
   const n = Math.sqrt(a.length)
 
   if (n - Math.floor(n) > 0 || n !== Math.sqrt(b.length)) {
@@ -35,7 +35,7 @@ export const matmul = (a: number[], b: number[]) => {
     }
   }
 
-  return result
+  return result as T
 }
 
 /* prettier-ignore */
@@ -304,10 +304,10 @@ export const transposeSquare = (m: number[]): number[] => {
  * @returns A 4x4 perspective projection matrix in column-major format
  */
 export const createPerspectiveMatrix = (
-  fovY: number,
-  aspect: number,
-  near: number,
-  far: number,
+  fovY: number = Math.PI / 4,
+  aspect = 1,
+  near = 0.1,
+  far = 100,
 ): Mat4 => {
   // Input validation
   if (near <= 0) {
@@ -401,7 +401,11 @@ export const createOrthographicMatrix = (
  * @param up Vector pointing upward (typically {x: 0, y: 1, z: 0})
  * @returns A 4x4 view matrix in column-major format
  */
-export const createViewMatrix = (eye: Vec3, target: Vec3, up: Vec3): Mat4 => {
+export const createViewMatrix = (
+  eye: Vec3 = vec3(0, 0, 0),
+  target: Vec3 = vec3(0, 0, -1),
+  up: Vec3 = vec3(0, 1, 0),
+): Mat4 => {
   // Input validation
   if (
     (eye.x === target.x && eye.y === target.y && eye.z === target.z) ||
@@ -463,4 +467,74 @@ export const createViewMatrix = (eye: Vec3, target: Vec3, up: Vec3): Mat4 => {
 export const normalMat = (modelViewMat: Mat4): Mat4 => {
   const normalMatrix4 = invertMatrix4x4(modelViewMat)
   return transpose(normalMatrix4)
+}
+
+/**
+ * Creates a rotation matrix for rotating around an arbitrary axis
+ *
+ * @param axis The axis to rotate around (must be normalized)
+ * @param angle The angle of rotation in radians
+ * @returns A 4x4 rotation matrix in column-major format
+ */
+export const createAxisAngleRotationMatrix = (
+  axis: Vec3,
+  angle: number,
+): Mat4 => {
+  // Ensure the axis is normalized
+  const safeAxis = normalize3(axis)
+  const { x, y, z } = safeAxis
+
+  const c = Math.cos(angle)
+  const s = Math.sin(angle)
+  const t = 1 - c
+
+  // Rotation matrix around arbitrary axis using Rodrigues' rotation formula
+  /* prettier-ignore */
+  return [
+    t * x * x + c,      t * x * y + s * z,  t * x * z - s * y,  0,
+    t * x * y - s * z,  t * y * y + c,      t * y * z + s * x,  0,
+    t * x * z + s * y,  t * y * z - s * x,  t * z * z + c,      0,
+    0,                  0,                  0,                  1
+  ];
+}
+
+/**
+ * Rotates a matrix around an arbitrary axis by a specified angle
+ *
+ * @param m The matrix to rotate
+ * @param axis The axis to rotate around
+ * @param angle The angle of rotation in radians
+ * @returns A new matrix that is the result of rotating m around axis by angle
+ */
+export const rotateAxisAngle = (m: Mat4, axis: Vec3, angle: number): Mat4 => {
+  const rotationMatrix = createAxisAngleRotationMatrix(axis, angle)
+  return matmul(m, rotationMatrix)
+}
+
+/**
+ * Creates a quaternion from an axis-angle representation
+ * This is useful if you want to switch to quaternion-based rotations
+ *
+ * @param axis The axis to rotate around (should be normalized)
+ * @param angle The angle of rotation in radians
+ * @returns A quaternion [x, y, z, w] representing the rotation
+ */
+export const axisAngleToQuaternion = (
+  axis: Vec3,
+  angle: number,
+): [number, number, number, number] => {
+  // Ensure the axis is normalized
+  const safeAxis = normalize3(axis)
+
+  // Calculate half angle values
+  const halfAngle = angle / 2
+  const sinHalfAngle = Math.sin(halfAngle)
+
+  // Calculate quaternion components
+  return [
+    safeAxis.x * sinHalfAngle,
+    safeAxis.y * sinHalfAngle,
+    safeAxis.z * sinHalfAngle,
+    Math.cos(halfAngle),
+  ]
 }

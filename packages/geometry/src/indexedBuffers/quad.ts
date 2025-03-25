@@ -1,7 +1,16 @@
+export const quadVertices = new Float32Array([
+  -1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0,
+])
+export const quadTexCoords = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1])
+export const quadNormals = new Float32Array([
+  0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+])
+export const quadIndices = new Uint16Array([0, 2, 1, 0, 3, 2])
+
 export const indexedQuad = {
   buffers: [
     {
-      data: new Float32Array([-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]),
+      data: quadVertices,
       attributes: [
         {
           name: 'i_Position',
@@ -11,7 +20,7 @@ export const indexedQuad = {
       ],
     },
     {
-      data: new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]),
+      data: quadNormals,
       attributes: [
         {
           name: 'i_Normal',
@@ -21,7 +30,7 @@ export const indexedQuad = {
       ],
     },
     {
-      data: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]),
+      data: quadTexCoords,
       attributes: [
         {
           name: 'i_TexCoord',
@@ -31,5 +40,5 @@ export const indexedQuad = {
       ],
     },
   ],
-  indices: new Uint16Array([0, 2, 1, 0, 3, 2]),
+  indices: quadIndices,
 }

@@ -1,8 +1,8 @@
-import type { AABB, Vec2, Vec3 } from '@geomm/api'
+import type { Vec2, Vec3 } from '@geomm/api'
 import {
   applyDamping,
   calculateGlobal,
-  integrateExternal,
+  applyForce,
   integrateSprings,
   updateNode,
   type Node,
@@ -57,6 +57,7 @@ export const createSoftBody = (
   const normals = Array(nodes.length)
   return {
     nodes,
+    prevNodes: [],
     color,
     pos,
     linearMomentum,
@@ -173,7 +174,7 @@ export const volumeField = (sb: SoftBody, point: Vec2, reg = 1) => {
 export const integrateForces = (sb: SoftBody) => {
   for (let i = 0; i < sb.nodes.length; i++) {
     const currentNode = sb.nodes[i]
-    integrateExternal(currentNode, sb.externalForce)
+    applyForce(currentNode, sb.externalForce)
     integrateSprings(currentNode, sb.nodes)
   }
 }

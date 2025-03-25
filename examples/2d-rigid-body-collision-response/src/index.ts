@@ -2,12 +2,11 @@ import { appendEl, canvas2d, drawPolygon } from '@geomm/dom'
 import { vec2 } from '@geomm/maths'
 import { boundingBox, boundingCircle, intersectsBC } from '@geomm/geometry'
 import {
-  type PhysicsObject2D,
-  applyImpulse,
-  impulseResolution,
   updateObject,
   createRigidBody2D,
+  collideWithImpulse,
 } from '@geomm/physics'
+import type { PhysicsObject2D } from '@geomm/api'
 
 const letterJPoints = [
   vec2(0, 0),
@@ -104,14 +103,7 @@ function updateAndDraw() {
       for (let j = i + 1; j < objects.length; j++) {
         const objA = objects[i]
         const objB = objects[j]
-        const { J: J1, collisionResult: cr1 } = impulseResolution(objA, objB, 1)
-        if (J1) {
-          applyImpulse(objA, objB, J1, cr1, deltaTime)
-        }
-        const { J: J2, collisionResult: cr2 } = impulseResolution(objB, objA, 1)
-        if (J2) {
-          applyImpulse(objB, objA, J2, cr2, deltaTime)
-        }
+        collideWithImpulse(objA, objB, deltaTime)
       }
     }
   }

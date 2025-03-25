@@ -1,6 +1,6 @@
 # GEOMM
 
-A [~~soon to be~~] collection of composable function blocks for creative computing [one day].
+A [~~soon to be~~] collection of things for creative computing [one day].
 
 This is largely a big playground for me to learn as I make. I'm trying to consolidate previous attempts at making flexible WebGL boilerplate libraries ([GL_BL](https://github.com/joshmurr/webgl_boilerplate), [GL-Handler](https://github.com/joshmurr/gl-handler)) and 3D graphics experiments into one network of packages. Whilst learning about functional programming methods in the process.
 

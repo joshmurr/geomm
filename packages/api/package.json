@@ -3,7 +3,7 @@
   "version": "1.0.4",
   "description": "",
   "type": "module",
-  "moduke": "./lib/index.js",
+  "module": "./lib/index.js",
   "typings": "./lib/types/index.d.ts",
   "scripts": {
     "build": "tsc",

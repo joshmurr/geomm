@@ -18,8 +18,7 @@
     "@geomm/api": "*",
     "@geomm/core": "*",
     "@geomm/geometry": "*",
-    "@geomm/maths": "*",
-    "gl-matrix": "^3.4.0"
+    "@geomm/maths": "*"
   },
   "browser": {
     "process": false

@@ -5,6 +5,7 @@ export type CollisionResult = {
   t1: number
   normal: Vec2
   vert?: Vec2
+  reflection?: Vec2
 }
 
 export type RigidBodyBase2D = {

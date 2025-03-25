@@ -77,6 +77,13 @@ export const testPointLine = (
         const dist = Math.sqrt(normal.x * normal.x + normal.y * normal.y)
         normal.x /= dist
         normal.y /= dist
+        //
+        // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
+        // 𝑟=𝑑−2(𝑑⋅𝑛)𝑛
+        /* const dir = normalize(sub(p2, p1)) */
+        /* const d = scale(normal, 2 * dot(normal, dir)) */
+        /* const reflection = sub(dir, d) */
+
         result = {
           pos: intersection,
           t1: t1,
