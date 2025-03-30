@@ -59,20 +59,17 @@ void main(){
   OUTCOLOUR = vec4(vec3(0.6, 0.6, 0.2) * v_Lighting, 1.0);
 }`
 
-let shape: IndexedBuffer
-
 async function loadObjFile(filePath: string): Promise<string> {
   const response = await fetch(filePath)
   return response.text()
 }
 
 loadObjFile('./src/gourd.obj').then((objFileContent) => {
-  shape = parseOBJ(objFileContent)
-  console.log('shape', shape)
-  main()
+  const shape = parseOBJ(objFileContent)
+  main(shape)
 })
 
-const main = () => {
+const main = (shape: IndexedBuffer) => {
   const [c, gl] = webgl2Canvas(512, 512)
   appendEl(c)
 

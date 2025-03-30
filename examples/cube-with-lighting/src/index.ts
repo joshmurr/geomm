@@ -11,7 +11,7 @@ import {
   translate,
   vec3,
 } from '@geomm/maths'
-import { computeFaceNormals, indexedCube } from '@geomm/geometry'
+import { indexedCube, ObjParser } from '@geomm/geometry'
 import { appendEl } from '@geomm/dom'
 
 const vertShader = `#version 300 es
@@ -62,7 +62,6 @@ void main(){
 }`
 
 const shape = indexedCube
-computeFaceNormals(shape)
 
 const [c, gl] = webgl2Canvas(512, 512)
 appendEl(c)
