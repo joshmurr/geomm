@@ -11,7 +11,7 @@ import {
   translate,
   vec3,
 } from '@geomm/maths'
-import { IndexedBuffer, ObjParser } from '@geomm/geometry'
+import { IndexedBuffer, parseOBJ } from '@geomm/geometry'
 import { appendEl } from '@geomm/dom'
 
 const vertShader = `#version 300 es
@@ -67,8 +67,8 @@ async function loadObjFile(filePath: string): Promise<string> {
 }
 
 loadObjFile('./src/gourd.obj').then((objFileContent) => {
-  const parser = new ObjParser()
-  shape = parser.parse(objFileContent)
+  shape = parseOBJ(objFileContent)
+  console.log('shape', shape)
   main()
 })
 

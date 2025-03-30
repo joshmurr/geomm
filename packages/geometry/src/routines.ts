@@ -20,6 +20,17 @@ export const computeFaceColors = (indices: Uint16Array) => {
   return colors
 }
 
+export const computeNormal = (positions: Float32Array) => {
+  const [p0, p1, p2] = getFace(new Uint16Array([0, 1, 2]), positions)
+
+  const normal = cross3(
+    sub3(vec3(p1[0], p1[1], p1[2]), vec3(p0[0], p0[1], p0[2])),
+    sub3(vec3(p2[0], p2[1], p2[2]), vec3(p0[0], p0[1], p0[2])),
+  )
+
+  return normalize3(normal)
+}
+
 export const computeNormals = (
   positions: Float32Array,
   indices: Uint16Array,

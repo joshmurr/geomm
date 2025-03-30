@@ -395,6 +395,31 @@ importers:
         specifier: ^4.3.9
         version: 4.5.9
 
+  examples/obj-loader:
+    dependencies:
+      '@geomm/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@geomm/dom':
+        specifier: workspace:*
+        version: link:../../packages/dom
+      '@geomm/geometry':
+        specifier: workspace:*
+        version: link:../../packages/geometry
+      '@geomm/maths':
+        specifier: workspace:*
+        version: link:../../packages/maths
+      '@geomm/webgl':
+        specifier: workspace:*
+        version: link:../../packages/webgl
+    devDependencies:
+      typescript:
+        specifier: ^4.9.4
+        version: 4.9.5
+      vite:
+        specifier: ^4.3.9
+        version: 4.5.9
+
   examples/particles-with-acceleration:
     dependencies:
       '@geomm/api':
