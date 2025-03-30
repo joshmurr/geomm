@@ -1,0 +1,27 @@
+{
+  "name": "@example/obj-loader",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TODO",
+  "repository": "https://github.com/joshmurr/geomm",
+  "author": "Josh Murr",
+  "scripts": {
+    "start": "vite --open",
+    "build": "tsc && vite build --base='./'",
+    "preview": "vite preview --host --open"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "@geomm/api": "workspace:*",
+    "@geomm/maths": "workspace:*",
+    "@geomm/geometry": "workspace:*",
+    "@geomm/webgl": "workspace:*",
+    "@geomm/dom": "workspace:*"
+  },
+  "browser": {
+    "process": false
+  }
+}
